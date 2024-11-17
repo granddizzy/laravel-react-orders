@@ -90,7 +90,7 @@ services:
       - ./code:/code/
     networks:
       - laravel-react-orders-network
-    command: bash
+    #command: npm start  # Запуск приложения React в режиме разработки
 
 #Docker Networks
 networks:
