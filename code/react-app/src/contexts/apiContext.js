@@ -3,7 +3,7 @@ import React, {createContext, useContext} from 'react';
 const ApiContext = createContext();
 
 export const ApiProvider = ({children}) => {
-  const apiUrl = 'https://lepihov.by/api-fashion-shop';
+  const apiUrl = 'http://mysite.local/api';
 
   return (
     <ApiContext.Provider value={apiUrl}>
