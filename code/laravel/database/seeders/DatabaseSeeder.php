@@ -21,8 +21,10 @@ class DatabaseSeeder extends Seeder
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',
         // ]);
+        $this->call([VoyagerDatabaseSeeder::class]);
         Organization::factory(1)->create();
         Contractor::factory(20)->create();
         Product::factory(100)->create();
+        $this->call([AdminSeeder::class]);
     }
 }
