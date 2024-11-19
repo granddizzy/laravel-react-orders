@@ -42,6 +42,16 @@ function Orders() {
       <Typography variant="body1" paragraph>
         Здесь отображается список заказов с их характеристиками.
       </Typography>
+      {/* Кнопка-ссылка */}
+      <Button
+        variant="contained"
+        color="primary"
+        component={Link}
+        to="/create-order"
+        sx={{ mb: 2 }}
+      >
+        Создать новый заказ
+      </Button>
 
       {/* Список товаров */}
       <Box sx={{border: '1px solid #ccc', borderRadius: 1, overflow: 'hidden'}}>
@@ -49,7 +59,7 @@ function Orders() {
         <Box
           sx={{
             display: 'grid',
-            gridTemplateColumns: '100px 2fr 2fr 2fr 1fr 3fr 150px',
+            gridTemplateColumns: '100px 2fr 2fr 2fr 3fr ',
             bgcolor: 'primary.main',
             color: 'white',
             p: 1,
@@ -58,10 +68,8 @@ function Orders() {
           <Typography fontWeight="bold">Номер</Typography>
           <Typography fontWeight="bold">Контрагент</Typography>
           <Typography fontWeight="bold">Менеджер</Typography>
-          <Typography fontWeight="bold">Организация</Typography>
           <Typography fontWeight="bold">Статус</Typography>
           <Typography fontWeight="bold">Адрес доставки</Typography>
-          <Typography fontWeight="bold">Общая сумма</Typography>
         </Box>
 
         {/* Список товаров */}
@@ -72,7 +80,7 @@ function Orders() {
             to={`/order/${order.id}`}
             sx={{
               display: 'grid',
-              gridTemplateColumns: '100px 2fr 2fr 2fr 1fr 3fr 150px',
+              gridTemplateColumns: '100px 2fr 2fr 2fr 3fr',
               textDecoration: 'none',
               color: 'inherit',
               p: 1,
@@ -86,12 +94,10 @@ function Orders() {
             }}
           >
             <Typography>{order.id}</Typography>
-            <Typography>{order.contractor}</Typography>
-            <Typography>{order.manager}</Typography>
-            <Typography>{order.organization}₽</Typography>
+            <Typography>{order.contractor_id}</Typography>
+            <Typography>{order.manager_id}</Typography>
             <Typography>{order.status}</Typography>
             <Typography>{order.shipping_address}</Typography>
-            <Typography>{order.total_amount}</Typography>
           </Box>
         ))}
       </Box>

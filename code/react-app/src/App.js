@@ -23,6 +23,7 @@ import Orders from "./components/Orders";
 import Contractors from "./components/Contractors";
 import ProductCreate from "./components/ProductCreate";
 import ContractorCreate from "./components/ContractorCreate";
+import OrderCreate from "./components/OrderCreate";
 
 const baseUrl = "";
 
@@ -49,6 +50,7 @@ function App() {
               <Route path="/catalog" element={<Products />} />
               <Route path="/create-product" element={<ProductCreate />} />
               <Route path="/create-contractor" element={<ContractorCreate />} />
+              <Route path="/create-order" element={<OrderCreate />} />
               {/* Главная страница по умолчанию */}
               <Route path="/" element={<Home />} />
             </Routes>

@@ -47,7 +47,6 @@ function ProductCreate() {
     event.preventDefault();
     setIsLoading(true); // Включаем индикатор загрузки
     try {
-      console.log(formData)
       const response = await fetch(`${apiUrl}/products`, {
         method: 'POST',
         headers: {

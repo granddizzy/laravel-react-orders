@@ -11,7 +11,8 @@ class OrderController extends Controller {
      * Display a listing of the resource.
      */
     public function index() {
-        $orders = Order::with('products')->get();
+//        $orders = Order::with('products')->get();
+        $orders = Order::all();
         return response()->json($orders);
     }
 
@@ -28,33 +29,33 @@ class OrderController extends Controller {
     public function store(Request $request) {
         // Валидируем данные запроса
         $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
+//            'user_id' => 'required|exists:users,id',
             'manager_id' => 'required|exists:managers,id',
-            'status' => 'required|in:pending,confirmed,shipped,completed,cancelled',
-            'total_amount' => 'required|numeric',
+//            'status' => 'required|in:pending,confirmed,shipped,completed,cancelled',
+//            'total_amount' => 'required|numeric',
             'shipping_address' => 'nullable|string',
             'billing_address' => 'nullable|string',
-            'ordered_at' => 'nullable|date',
-            'shipped_at' => 'nullable|date',
-            'completed_at' => 'nullable|date',
-            'organization_id' => 'required|exists:organizations,id',  // Привязка к организации
+//            'ordered_at' => 'nullable|date',
+//            'shipped_at' => 'nullable|date',
+//            'completed_at' => 'nullable|date',
+//            'organization_id' => 'required|exists:organizations,id',  // Привязка к организации
             'contractor_id' => 'required|exists:contractors,id',  // Привязка к контрагенту
             'products' => 'required|array',  // Продукты, связанные с заказом
-            'products.*.product_id' => 'required|exists:products,id',  // Каждый продукт должен существовать
-            'products.*.quantity' => 'required|integer|min:1',  // Количество каждого продукта
+//            'products.*.product_id' => 'required|exists:products,id',  // Каждый продукт должен существовать
+//            'products.*.quantity' => 'required|integer|min:1',  // Количество каждого продукта
         ]);
 
         // Создаем заказ
         $order = Order::create($validated);
-
-        // Привязываем продукты к заказу (через pivot таблицу)
-        foreach ($request->products as $product) {
-            $order->products()->attach($product['product_id'], [
-                'quantity' => $product['quantity'],
-                'price' => $product['price'],  // цена может быть передана в запросе
-                'total' => $product['quantity'] * $product['price'],  // Общая сумма за продукт
-            ]);
-        }
+//
+//        // Привязываем продукты к заказу (через pivot таблицу)
+//        foreach ($request->products as $product) {
+//            $order->products()->attach($product['product_id'], [
+//                'quantity' => $product['quantity'],
+////                'price' => $product['price'],  // цена может быть передана в запросе
+////                'total' => $product['quantity'] * $product['price'],  // Общая сумма за продукт
+//            ]);
+//        }
 
         return response()->json($order, 201);
     }
