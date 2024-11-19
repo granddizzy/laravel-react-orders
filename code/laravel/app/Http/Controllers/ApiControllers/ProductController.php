@@ -37,7 +37,7 @@ class ProductController extends Controller
         'price' => 'required|numeric|min:0',
         'unit' => 'nullable|string',
         'stock_quantity' => 'required|integer|min:0',
-        'sku' => 'nullable|string|unique:products',  // Уникальность артикулов
+//        'sku' => 'nullable|string|unique:products',  // Уникальность артикулов
       ]);
 
       // Создаем новый продукт

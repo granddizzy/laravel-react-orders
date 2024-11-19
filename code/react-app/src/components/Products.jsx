@@ -15,6 +15,7 @@ import {
 import {useDispatch, useSelector} from "react-redux";
 import {fetchProducts} from "../redux/productSlice";
 import {useApi} from "../contexts/apiContext";
+import {Link} from "react-router-dom";
 
 function Products() {
 
@@ -36,7 +37,6 @@ function Products() {
   }, [dispatch, currentPage]);
 
 
-
   const handlePageChange = (page) => {
     dispatch(setPage(page)); // Изменяем текущую страницу
   };
@@ -52,37 +52,68 @@ function Products() {
       <Typography variant="body1" paragraph>
         Здесь отображается список товаров с их характеристиками.
       </Typography>
+      {/* Кнопка-ссылка */}
+      <Button
+        variant="contained"
+        color="primary"
+        component={Link}
+        to="/create-product"
+        sx={{ mb: 2 }}
+      >
+        Создать новый продукт
+      </Button>
+
 
       {/* Список товаров */}
-      <TableContainer component={Paper}>
-        <Table>
-          {/* Заголовки таблицы */}
-          <TableHead>
-            <TableRow>
-              <TableCell><Typography variant="body1">Артикул</Typography></TableCell>
-              <TableCell><Typography variant="body1">Наименование</Typography></TableCell>
-              <TableCell><Typography variant="body1">Описание</Typography></TableCell>
-              <TableCell><Typography variant="body1">Цена</Typography></TableCell>
-              <TableCell><Typography variant="body1">Количество</Typography></TableCell>
-              <TableCell><Typography variant="body1">Ед. измер.</Typography></TableCell>
-            </TableRow>
-          </TableHead>
+      <Box sx={{border: '1px solid #ccc', borderRadius: 1, overflow: 'hidden'}}>
+        {/* Заголовок таблицы */}
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: '150px 1fr 2fr 100px 100px 100px',
+            bgcolor: 'primary.main',
+            color: 'white',
+            p: 1,
+          }}
+        >
+          <Typography fontWeight="bold">Артикул</Typography>
+          <Typography fontWeight="bold">Наименование</Typography>
+          <Typography fontWeight="bold">Описание</Typography>
+          <Typography fontWeight="bold">Цена</Typography>
+          <Typography fontWeight="bold">Количество</Typography>
+          <Typography fontWeight="bold">Ед. изм.</Typography>
+        </Box>
 
-          {/* Тело таблицы с данными товаров */}
-          <TableBody>
-            {products.map((product) => (
-              <TableRow key={product.id}>
-                <TableCell>{product.article}</TableCell>
-                <TableCell>{product.name}</TableCell>
-                <TableCell>{product.description}</TableCell>
-                <TableCell>{product.price}₽</TableCell>
-                <TableCell>{product.quantity}</TableCell>
-                <TableCell>{product.unit}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+        {/* Список товаров */}
+        {products.map((product, index) => (
+          <Box
+            key={product.id}
+            component={Link}
+            to={`/product/${product.id}`}
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: '150px 1fr 2fr 100px 100px 100px',
+              textDecoration: 'none',
+              color: 'inherit',
+              p: 1,
+              bgcolor: index % 2 === 0 ? 'grey.50' : 'grey.100', // Чередование строк
+              '&:hover': {
+                bgcolor: 'primary.light', // Яркий фон при наведении
+                color: 'white',
+              },
+              borderBottom: '1px solid #eee',
+              transition: 'background-color 0.3s ease', // Плавный переход
+            }}
+          >
+            <Typography>{product.article}</Typography>
+            <Typography>{product.name}</Typography>
+            <Typography>{product.description}</Typography>
+            <Typography>{product.price}₽</Typography>
+            <Typography>{product.quantity}</Typography>
+            <Typography>{product.unit}</Typography>
+          </Box>
+        ))}
+      </Box>
 
       {/* Пагинация */}
       <Box sx={{mt: 3, display: 'flex', justifyContent: 'space-between'}}>
