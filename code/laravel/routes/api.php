@@ -5,6 +5,7 @@ use app\Http\Controllers\ApiControllers\ManagerController;
 use app\Http\Controllers\ApiControllers\OrderController;
 use app\Http\Controllers\ApiControllers\OrganizationController;
 use app\Http\Controllers\ApiControllers\ProductController;
+use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -23,8 +24,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-//Route::middleware('auth:sanctum')->group(function () {
-Route::middleware([])->group(function () {
+Route::middleware('auth:sanctum')->group(function () {
+//Route::middleware([])->group(function () {
     // Ресурсные маршруты для сущностей
     Route::apiResource('organizations', OrganizationController::class); // организации
     Route::apiResource('contractors', ContractorController::class); // контрагенты
@@ -40,6 +41,6 @@ Route::middleware([])->group(function () {
 });
 
 // Маршруты для аутентификации (без авторизации)
-//Route::post('register', [AuthController::class, 'register']); // Регистрация
-//Route::post('login', [AuthController::class, 'login']);       // Логин
-//Route::post('logout', [AuthController::class, 'logout']);     // Логаут
+Route::post('register', [AuthController::class, 'register']);
+Route::post('login', [AuthController::class, 'login']);
+Route::middleware('auth:sanctum')->post('logout', [AuthController::class, 'logout']);
