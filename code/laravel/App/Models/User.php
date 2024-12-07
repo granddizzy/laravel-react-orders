@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Laravel\Sanctum\PersonalAccessToken;
 
-class User extends \TCG\Voyager\Models\User
-{
+class User extends \TCG\Voyager\Models\User {
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
@@ -42,4 +42,9 @@ class User extends \TCG\Voyager\Models\User
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    // Связь с токенами
+    public function tokens() {
+        return $this->hasMany(PersonalAccessToken::class);
+    }
 }

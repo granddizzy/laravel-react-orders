@@ -1,2 +1,6 @@
 /.env
 /db/
+/phpsocket/php-fpm.sock
+/phpsocket/nginx.pid
+/phpsocket/crond.pid
+/phpsocket/crond.reboot
