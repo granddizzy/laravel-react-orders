@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -24,6 +25,14 @@ class AuthController extends Controller {
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+
+        // добавляем роль пользователя
+        DB::table('user_roles')->updateOrInsert(
+            [
+                'user_id' => $user->id,
+                'role_id' => 2,
+            ]
+        );
 
         return response()->json(['message' => 'User registered successfully'], 201);
     }
@@ -59,8 +68,7 @@ class AuthController extends Controller {
         return response()->json(['message' => 'Logged out successfully']);
     }
 
-    public function updateProfile(Request $request)
-    {
+    public function updateProfile(Request $request) {
         // Валидация входных данных
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255', // Имя обязательно
