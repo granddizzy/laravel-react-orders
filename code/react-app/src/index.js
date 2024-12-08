@@ -1,12 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import App from './App';
 import reportWebVitals from './reportWebVitals';
 import {Provider} from "react-redux";
 import store from './redux/store';
 import {ApiProvider} from "./contexts/apiContext";
 import {createTheme, ThemeProvider} from "@mui/material";
+import App from "./App";
 
 const theme = createTheme({
   breakpoints: {
@@ -25,11 +25,11 @@ root.render(
   // <React.StrictMode>
   <Provider store={store}>
     {/*<PersistGate loading={null} persistor={persistor}>*/}
-      <ApiProvider>
-        <ThemeProvider theme={theme}>
+    <ApiProvider>
+      <ThemeProvider theme={theme}>
         <App/>
-        </ThemeProvider>
-      </ApiProvider>
+      </ThemeProvider>
+    </ApiProvider>
     {/*</PersistGate>*/}
   </Provider>
   // </React.StrictMode>

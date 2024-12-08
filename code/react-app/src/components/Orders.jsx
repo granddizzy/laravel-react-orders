@@ -3,7 +3,6 @@ import React, {useEffect} from 'react';
 import {Typography, Box, Button} from '@mui/material';
 import {useDispatch, useSelector} from "react-redux";
 import {useApi} from "../contexts/apiContext";
-import {fetchProducts} from "../redux/productSlice";
 import {Link} from "react-router-dom";
 import {fetchOrders} from "../redux/ordersSlice";
 

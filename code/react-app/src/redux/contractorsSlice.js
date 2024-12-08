@@ -5,7 +5,13 @@ export const fetchContractors = createAsyncThunk(
   'contractors/fetchContractors',
   async (url) => {
     try {
-      const response = await axios.get(url);
+      // Получаем токен из локального хранилища
+      const token = localStorage.getItem('token'); // Или используй getState(), если токен в Redux
+
+      // Формируем заголовки с токеном
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+      const response = await axios.get(url, {headers});
       if (response.status !== 200) {
         throw new Error(`Error: ${response.statusText}`);
       }

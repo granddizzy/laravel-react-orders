@@ -2,6 +2,7 @@ import {configureStore} from '@reduxjs/toolkit';
 import productReducer from "./productSlice";
 import contractorsReducer from "./contractorsSlice";
 import ordersReducer from "./ordersSlice";
+import authReducer from "./authSlice";
 import contractors from "../components/Contractors";
 
 const store = configureStore({
@@ -10,6 +11,7 @@ const store = configureStore({
     products: productReducer,
     contractors: contractorsReducer,
     orders: ordersReducer,
+    auth: authReducer,
     // cartItems: cartReducer,
     // catalogFilter: catalogFilterReducer,
     // product: productReducer,

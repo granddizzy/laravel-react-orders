@@ -45,6 +45,6 @@ class User extends \TCG\Voyager\Models\User {
 
     // Связь с токенами
     public function tokens() {
-        return $this->hasMany(PersonalAccessToken::class);
+        return $this->morphMany(PersonalAccessToken::class, 'tokenable');
     }
 }

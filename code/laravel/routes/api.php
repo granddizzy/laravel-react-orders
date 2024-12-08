@@ -40,7 +40,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('contractors/{contractor}/orders', [ContractorController::class, 'getOrders']); // Заказы контрагента
 });
 
-// Маршруты для аутентификации (без авторизации)
+// Маршруты для аутентификации
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
+Route::middleware('auth:sanctum')->put('/profile', [AuthController::class, 'updateProfile']);
 Route::middleware('auth:sanctum')->post('logout', [AuthController::class, 'logout']);
