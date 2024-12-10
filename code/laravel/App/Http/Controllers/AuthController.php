@@ -43,6 +43,11 @@ class AuthController extends Controller {
             'password' => 'required',
         ]);
 
+        // Если валидация не прошла
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 422);
+        }
+
         // Проверка, существует ли пользователь с данным email
         $user = User::where('email', $request->email)->first();
 
@@ -57,7 +62,13 @@ class AuthController extends Controller {
         // Создаем новый токен
         $token = $user->createToken('AuthToken')->plainTextToken;
 
-        $roles = $user->roles->pluck('name');
+        $roles = $user->roles->map(function ($role) {
+            return [
+                'name' => $role->name,
+                'displayName' => $role->display_name,
+            ];
+        });
+
         $userData = [
             'id' => $user->id,
             'name' => $user->name,
@@ -79,8 +90,8 @@ class AuthController extends Controller {
     public function updateProfile(Request $request) {
         // Валидация входных данных
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255', // Имя обязательно
-            'password' => 'nullable|string|min:8|confirmed', // Если пароль передан, он должен быть подтвержден и не менее 6 символов
+            'name' => 'required|string|max:255',
+            'password' => 'nullable|string|min:8',
         ]);
 
         // Если валидация не прошла
@@ -93,6 +104,10 @@ class AuthController extends Controller {
         // Получаем текущего аутентифицированного пользователя
         $user = auth()->user();
 
+        if (!$user) {
+            return response()->json(['error' => 'Пользователь не аутентифицирован'], 401);
+        }
+
         // Обновляем имя пользователя
         $user->name = $request->name;
 
@@ -104,7 +119,21 @@ class AuthController extends Controller {
         // Сохраняем обновленные данные
         $user->save();
 
+        $roles = $user->roles->map(function ($role) {
+            return [
+                'name' => $role->name,
+                'displayName' => $role->display_name,
+            ];
+        });
+
+        $userData = [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'roles' => $roles,
+        ];
+
         // Возвращаем обновленные данные пользователя
-        return response()->json($user);
+        return response()->json($userData);
     }
 }

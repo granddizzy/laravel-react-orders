@@ -19,7 +19,6 @@ const Profile = () => {
   // Получаем данные пользователя из Redux
   const user = useSelector((state) => state.auth.user);
   const token = useSelector((state) => state.auth.token);
-  console.log(user);
   // Используем контекст для базового URL API
   const baseUrl = useApi();
 
@@ -27,7 +26,7 @@ const Profile = () => {
   const [formData, setFormData] = useState({
     name: user?.name || '',
     password: '', // Новое поле для пароля
-    confirmPassword: '', // Новое поле для подтверждения пароля
+    password_confirmation: '', // Новое поле для подтверждения пароля
   });
 
   const [error, setError] = useState(null);
@@ -44,7 +43,7 @@ const Profile = () => {
     e.preventDefault();
     setIsUpdating(true); // Начинаем обновление
 
-    if (formData.password && formData.password !== formData.confirmPassword) {
+    if (formData.password && formData.password !== formData.password_confirmation) {
       setError('Пароли не совпадают');
       setIsUpdating(false);
       return;
@@ -52,7 +51,8 @@ const Profile = () => {
 
     const dataToSubmit = {
       name: formData.name,
-      password: formData.password || undefined, // Отправляем пароль только если он изменен
+      password: formData.password || undefined,
+      password_confirmation: formData.password_confirmation || undefined,
     };
 
     try {
@@ -115,8 +115,8 @@ const Profile = () => {
         />
         <TextField
           label="Подтвердите новый пароль"
-          name="confirmPassword"
-          value={formData.confirmPassword}
+          name="password_confirmation"
+          value={formData.password_confirmation}
           onChange={handleChange}
           type="password"
           variant="outlined"
@@ -127,7 +127,7 @@ const Profile = () => {
         {/* Выводим роль пользователя */}
         {user?.roles && user.roles.length > 0 && (
           <Typography variant="body1" sx={{ marginTop: 2 }}>
-            Роль: {user.roles[0]?.name || 'Не назначена'}
+            Роль: {user.roles[0]?.displayName || 'Не назначена'}
           </Typography>
         )}
 

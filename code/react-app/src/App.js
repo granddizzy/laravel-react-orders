@@ -24,42 +24,8 @@ const baseUrl = "";
 
 function App() {
   const isDesktop = useMediaQuery((theme) => theme.breakpoints.up('sm')); // Определяем десктоп
-  // const [isLoading, setIsLoading] = useState(true);
 
   const auth = useSelector((state) => state.auth);
-
-  // Проверяем наличие токена сразу при загрузке
-  // useEffect(() => {
-  //   const checkToken = async () => {
-  //     const token = localStorage.getItem('token');
-  //     if (token) {
-  //       try {
-  //         const response = await fetch('https://example.com/api/validate-token', {
-  //           method: 'POST',
-  //           headers: {
-  //             'Content-Type': 'application/json',
-  //             'Authorization': `Bearer ${token}`,
-  //           },
-  //         });
-  //         if (response.ok) {
-  //           setAuth({token});
-  //         } else {
-  //           logout(); // Если токен недействителен, выходим
-  //         }
-  //       } catch (error) {
-  //         console.error('Ошибка проверки токена:', error);
-  //         logout();
-  //       }
-  //     }
-  //   };
-  //
-  //   checkToken();
-  // }, []);
-
-  // Если приложение еще загружается (проверка токена), показываем что-то вроде загрузки
-  // if (isLoading) {
-  //   return <div>Загрузка...</div>;
-  // }
 
   return (
     <Router basename={baseUrl}>
