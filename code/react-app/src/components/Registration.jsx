@@ -51,7 +51,7 @@ const Register = () => {
       const token = loginResponse.data.token;
 
       // Сохранение токена
-      dispatch(login({token, user: null})); // user можно заполнить, если API возвращает данные пользователя
+      dispatch(login({token, user: loginResponse.data.user}));
 
       setError(null);
       navigate('/');

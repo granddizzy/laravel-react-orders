@@ -3,11 +3,8 @@ import axios from 'axios';
 
 export const fetchProducts = createAsyncThunk(
   'product/fetchProducts',
-  async (url) => {
+  async ({url, token}) => {
     try {
-      // Получаем токен из локального хранилища
-      const token = localStorage.getItem('token'); // Или используй getState(), если токен в Redux
-
       // Формируем заголовки с токеном
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
 

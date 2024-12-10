@@ -19,7 +19,7 @@ const Profile = () => {
   // Получаем данные пользователя из Redux
   const user = useSelector((state) => state.auth.user);
   const token = useSelector((state) => state.auth.token);
-
+  console.log(user);
   // Используем контекст для базового URL API
   const baseUrl = useApi();
 
@@ -124,6 +124,13 @@ const Profile = () => {
           disabled={isUpdating}
         />
 
+        {/* Выводим роль пользователя */}
+        {user?.roles && user.roles.length > 0 && (
+          <Typography variant="body1" sx={{ marginTop: 2 }}>
+            Роль: {user.roles[0]?.name || 'Не назначена'}
+          </Typography>
+        )}
+
         <Box sx={{ display: 'flex', gap: 2, justifyContent: 'space-between' }}>
           <Button
             type="submit"
@@ -131,7 +138,7 @@ const Profile = () => {
             color="primary"
             disabled={isUpdating} // Отключаем кнопку при загрузке
           >
-            {isUpdating ? <CircularProgress size={24} color="inherit" /> : 'Обновить'}
+            {isUpdating ? <CircularProgress size={24} color="inherit" /> : 'Изменить'}
           </Button>
         </Box>
       </Box>

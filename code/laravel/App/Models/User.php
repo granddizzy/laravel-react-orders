@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Sanctum\PersonalAccessToken;
+use TCG\Voyager\Models\Role;
 
 class User extends \TCG\Voyager\Models\User {
     use HasApiTokens, HasFactory, Notifiable;
@@ -46,5 +47,10 @@ class User extends \TCG\Voyager\Models\User {
     // Связь с токенами
     public function tokens() {
         return $this->morphMany(PersonalAccessToken::class, 'tokenable');
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id');
     }
 }

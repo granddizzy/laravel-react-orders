@@ -10,7 +10,7 @@ function Orders() {
 
   const dispatch = useDispatch();
   const {orders, loading, error, currentPage, totalPages, setPage} = useSelector((state) => state.orders);
-
+  const token = useSelector((state) => state.auth.token);
   const generateQueryParams = () => {
     const params = new URLSearchParams();
     params.append("page", currentPage);
@@ -22,7 +22,10 @@ function Orders() {
 
   useEffect(() => {
     const queryParams = generateQueryParams();
-    dispatch(fetchOrders(`${apiUrl}/orders?${queryParams}`));
+    dispatch(fetchOrders({
+      url: `${apiUrl}/orders?${queryParams}`,
+      token: token,
+    }));
   }, [dispatch, currentPage]);
 
 
@@ -47,7 +50,7 @@ function Orders() {
         color="primary"
         component={Link}
         to="/create-order"
-        sx={{ mb: 2 }}
+        sx={{mb: 2}}
       >
         Создать новый заказ
       </Button>

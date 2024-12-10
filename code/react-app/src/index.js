@@ -7,6 +7,8 @@ import store from './redux/store';
 import {ApiProvider} from "./contexts/apiContext";
 import {createTheme, ThemeProvider} from "@mui/material";
 import App from "./App";
+import {PersistGate} from 'redux-persist/integration/react';
+import {persistor} from "./redux/persistStore";
 
 const theme = createTheme({
   breakpoints: {
@@ -24,13 +26,13 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   // <React.StrictMode>
   <Provider store={store}>
-    {/*<PersistGate loading={null} persistor={persistor}>*/}
-    <ApiProvider>
-      <ThemeProvider theme={theme}>
-        <App/>
-      </ThemeProvider>
-    </ApiProvider>
-    {/*</PersistGate>*/}
+    <PersistGate loading={<div>Loading...</div>} persistor={persistor}>
+      <ApiProvider>
+        <ThemeProvider theme={theme}>
+          <App/>
+        </ThemeProvider>
+      </ApiProvider>
+    </PersistGate>
   </Provider>
   // </React.StrictMode>
 );

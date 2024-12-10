@@ -11,6 +11,7 @@ function Contractors() {
 
   const dispatch = useDispatch();
   const {contractors, loading, error, currentPage, totalPages, setPage} = useSelector((state) => state.contractors);
+  const token = useSelector((state) => state.auth.token);
 
   const generateQueryParams = () => {
     const params = new URLSearchParams();
@@ -23,7 +24,10 @@ function Contractors() {
 
   useEffect(() => {
     const queryParams = generateQueryParams();
-    dispatch(fetchContractors(`${apiUrl}/contractors?${queryParams}`));
+    dispatch(fetchContractors({
+      url: `${apiUrl}/contractors?${queryParams}`,
+      token: token
+    }));
   }, [dispatch, currentPage]);
 
 
@@ -48,7 +52,7 @@ function Contractors() {
         color="primary"
         component={Link}
         to="/create-contractor"
-        sx={{ mb: 2 }}
+        sx={{mb: 2}}
       >
         Создать нового контрагента
       </Button>

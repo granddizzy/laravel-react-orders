@@ -57,9 +57,17 @@ class AuthController extends Controller {
         // Создаем новый токен
         $token = $user->createToken('AuthToken')->plainTextToken;
 
+        $roles = $user->roles->pluck('name');
+        $userData = [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'roles' => $roles,
+        ];
+
         return response()->json([
             'token' => $token,
-            'user' => $user,
+            'user' => $userData,
         ]);
     }
 

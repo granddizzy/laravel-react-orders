@@ -21,6 +21,7 @@ function Products() {
 
   const dispatch = useDispatch();
   const {products, loading, error, currentPage, totalPages, setPage} = useSelector((state) => state.products);
+  const token = useSelector((state) => state.auth.token);
 
   const generateQueryParams = () => {
     const params = new URLSearchParams();
@@ -33,7 +34,10 @@ function Products() {
 
   useEffect(() => {
     const queryParams = generateQueryParams();
-    dispatch(fetchProducts(`${apiUrl}/products?${queryParams}`));
+    dispatch(fetchProducts({
+      url: `${apiUrl}/products?${queryParams}`,
+      token: token
+    }));
   }, [dispatch, currentPage]);
 
 
@@ -58,7 +62,7 @@ function Products() {
         color="primary"
         component={Link}
         to="/create-product"
-        sx={{ mb: 2 }}
+        sx={{mb: 2}}
       >
         Создать новый продукт
       </Button>
