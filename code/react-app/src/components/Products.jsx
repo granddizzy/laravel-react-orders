@@ -4,13 +4,6 @@ import {
   Typography,
   Box,
   Button,
-  CardContent,
-  CardMedia,
-  Grid2,
-  Card,
-  TableCell,
-  TableHead,
-  TableRow, TableBody, TableContainer, Table, Paper
 } from '@mui/material';
 import {useDispatch, useSelector} from "react-redux";
 import {fetchProducts} from "../redux/productSlice";

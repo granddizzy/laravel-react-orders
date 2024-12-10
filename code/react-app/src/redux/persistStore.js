@@ -3,21 +3,27 @@ import {persistReducer, persistStore} from 'redux-persist';
 import sessionStorage from 'redux-persist/lib/storage/session';
 import {combineReducers} from 'redux';
 import authReducer from './authSlice';
+import productReducer from "./productSlice";
+import contractorsReducer from "./contractorsSlice";
+import ordersReducer from "./ordersSlice";
 
 const persistConfig = {
   key: '8SUp0r0TYlKTPfmf5kr8wKz5pIIMX4B5_root',
   storage: sessionStorage,
   whitelist: ['auth'],
-  debug: true,
+  // debug: true,
 };
 
 const rootReducer = combineReducers({
   auth: authReducer,
+  products: productReducer,
+  contractors: contractorsReducer,
+  orders: ordersReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-export const store = configureStore({
+const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -26,14 +32,6 @@ export const store = configureStore({
   // devTools: false, // Отключаем DevTools
 });
 
-export const persistor = persistStore(store);
+const persistor = persistStore(store);
 
-// Включите обработчик ошибок
-store.subscribe(() => {
-  try {
-    const state = persistor.getState();
-    console.log('Persistor state updated:', state);
-  } catch (error) {
-    console.error('Error in persistor subscription:', error);
-  }
-});
+export {store, persistor};

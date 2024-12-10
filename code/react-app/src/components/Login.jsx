@@ -5,7 +5,6 @@ import {login} from '../redux/authSlice';
 import {useApi} from "../contexts/apiContext";
 import axios from 'axios';
 import {Link, useNavigate} from "react-router-dom";
-import {persistor} from "../redux/persistStore";
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -27,7 +26,6 @@ const Login = () => {
       const response = await axios.post(`${apiUrl}/login`, {email, password});
       const token = response.data.token; // Получаем токен из ответа
       dispatch(login({token, user: response.data.user}));
-      // persistor.persist();
 
       setEmail('');
       setPassword('');
