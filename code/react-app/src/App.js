@@ -21,6 +21,7 @@ import Registration from "./components/Registration";
 import Profile from "./components/Profile";
 
 const baseUrl = "";
+// const baseUrl = "/orders-app";
 
 function App() {
   const isDesktop = useMediaQuery((theme) => theme.breakpoints.up('sm')); // Определяем десктоп
