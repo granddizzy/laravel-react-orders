@@ -3,7 +3,7 @@ import React, {useEffect} from 'react';
 import {
   Typography,
   Box,
-  Button,
+  Button, useTheme, useMediaQuery,
 } from '@mui/material';
 import {useDispatch, useSelector} from "react-redux";
 import {fetchProducts} from "../redux/productSlice";
@@ -11,10 +11,12 @@ import {useApi} from "../contexts/apiContext";
 import {Link} from "react-router-dom";
 
 function Products() {
-
   const dispatch = useDispatch();
   const {products, loading, error, currentPage, totalPages, setPage} = useSelector((state) => state.products);
   const token = useSelector((state) => state.auth.token);
+
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('md')); // Проверка на маленький экран
 
   const generateQueryParams = () => {
     const params = new URLSearchParams();
@@ -57,14 +59,16 @@ function Products() {
         to="/create-product"
         sx={{mb: 2}}
       >
-        Создать новый продукт
+        Добавить новый продукт
       </Button>
 
 
       {/* Список товаров */}
       <Box sx={{border: '1px solid #ccc', borderRadius: 1, overflow: 'hidden'}}>
+
         {/* Заголовок таблицы */}
-        <Box
+        {isSmallScreen ? (
+          <></>) : (<Box
           sx={{
             display: 'grid',
             gridTemplateColumns: '150px 1fr 2fr 100px 100px 100px',
@@ -75,11 +79,11 @@ function Products() {
         >
           <Typography fontWeight="bold">Артикул</Typography>
           <Typography fontWeight="bold">Наименование</Typography>
-          <Typography fontWeight="bold">Описание</Typography>
           <Typography fontWeight="bold">Цена</Typography>
           <Typography fontWeight="bold">Количество</Typography>
-          <Typography fontWeight="bold">Ед. изм.</Typography>
-        </Box>
+          <Typography fontWeight="bold">Ед.изм.</Typography>
+        </Box>)}
+
 
         {/* Список товаров */}
         {products.map((product, index) => (
@@ -89,30 +93,63 @@ function Products() {
             to={`/product/${product.id}`}
             sx={{
               display: 'grid',
-              gridTemplateColumns: '150px 1fr 2fr 100px 100px 100px',
+              gridTemplateColumns: isSmallScreen
+                ? '1fr' // Один столбец на маленьком экране
+                : '150px 1fr 2fr 100px 100px 100px', // Стандартное оформление на большом экране
               textDecoration: 'none',
               color: 'inherit',
               p: 1,
-              bgcolor: index % 2 === 0 ? 'grey.50' : 'grey.100', // Чередование строк
+              bgcolor: index % 2 === 0 ? 'grey.50' : 'grey.100',
               '&:hover': {
-                bgcolor: 'primary.light', // Яркий фон при наведении
+                bgcolor: 'primary.light',
                 color: 'white',
               },
               borderBottom: '1px solid #eee',
-              transition: 'background-color 0.3s ease', // Плавный переход
+              transition: 'background-color 0.3s ease',
             }}
           >
-            <Typography>{product.article}</Typography>
-            <Typography>{product.name}</Typography>
-            <Typography>{product.description}</Typography>
-            <Typography>{product.price}₽</Typography>
-            <Typography>{product.quantity}</Typography>
-            <Typography>{product.unit}</Typography>
+            {isSmallScreen ? (
+              // Для маленьких экранов показываем значения в виде "ключ: значение"
+              <>
+                <Box sx={{display: 'flex', flexDirection: 'column'}}>
+                  <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+                    <Typography fontWeight="bold">Артикул:</Typography>
+                    <Typography>{product.article}</Typography>
+                  </Box>
+                  <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+                    <Typography fontWeight="bold">Наименование:</Typography>
+                    <Typography>{product.name}</Typography>
+                  </Box>
+                  <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+                    <Typography fontWeight="bold">Цена:</Typography>
+                    <Typography>{product.price}₽</Typography>
+                  </Box>
+                  <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+                    <Typography fontWeight="bold">Количество:</Typography>
+                    <Typography>{product.quantity}</Typography>
+                  </Box>
+                  <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+                    <Typography fontWeight="bold">Ед. изм.:</Typography>
+                    <Typography>{product.unit}</Typography>
+                  </Box>
+                </Box>
+              </>
+            ) : (
+              // Для больших экранов показываем стандартную таблицу
+              <>
+                <Typography>{product.article}</Typography>
+                <Typography>{product.name}</Typography>
+                <Typography>{product.price}₽</Typography>
+                <Typography>{product.quantity}</Typography>
+                <Typography>{product.unit}</Typography>
+              </>
+            )}
           </Box>
         ))}
       </Box>
 
-      {/* Пагинация */}
+      {/* Пагинация */
+      }
       <Box sx={{mt: 3, display: 'flex', justifyContent: 'space-between'}}>
         <Button
           onClick={() => handlePageChange(currentPage - 1)}
@@ -131,7 +168,8 @@ function Products() {
         </Button>
       </Box>
     </Box>
-  );
+  )
+    ;
 }
 
 export default Products;
