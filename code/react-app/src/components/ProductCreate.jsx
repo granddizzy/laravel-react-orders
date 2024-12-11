@@ -148,10 +148,25 @@ function ProductCreate() {
         </Typography>
       )}
 
-      {/* Кнопка отправки */}
-      <Button type="submit" variant="contained" color="primary" disabled={isLoading}>
-        {isLoading ? 'Создание...' : 'Создать продукт'}
-      </Button>
+      {/* Кнопки отправки и отмены */}
+      <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+        <Button
+          type="button"
+          variant="outlined"
+          color="secondary"
+          onClick={() => navigate(-1)}
+        >
+          Отмена
+        </Button>
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          disabled={isLoading}
+        >
+          {isLoading ? 'Создание...' : 'Создать продукт'}
+        </Button>
+      </Box>
     </Box>
   );
 }
