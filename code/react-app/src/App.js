@@ -19,6 +19,8 @@ import Login from "./components/Login";
 import {useSelector} from "react-redux";
 import Registration from "./components/Registration";
 import Profile from "./components/Profile";
+import ProductEdit from "./components/ProductEdit";
+import Product from "./components/Product";
 
 const baseUrl = "";
 // const baseUrl = "/orders-app";
@@ -50,8 +52,13 @@ function App() {
               <Route path="/orders" element={auth.token ? <Orders/> : <Navigate to="/login"/>}/>
               <Route path="/clients" element={auth.token ? <Contractors/> : <Navigate to="/login"/>}/>
               <Route path="/catalog" element={auth.token ? <Products/> : <Navigate to="/login"/>}/>
+
+              <Route path="/products/:productId" element={auth.token ? <Product/> : <Navigate to="/login"/>}/>
               <Route path="/create-product" element={auth.token ? <ProductCreate/> : <Navigate to="/login"/>}/>
+              <Route path="/edit-product/:productId" element={auth.token ? <ProductEdit/> : <Navigate to="/login"/>}/>
+
               <Route path="/create-contractor" element={auth.token ? <ContractorCreate/> : <Navigate to="/login"/>}/>
+
               <Route path="/create-order" element={auth.token ? <OrderCreate/> : <Navigate to="/login"/>}/>
 
               {/* Регистрация */}

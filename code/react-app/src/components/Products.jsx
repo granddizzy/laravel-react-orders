@@ -90,7 +90,7 @@ function Products() {
           <Box
             key={product.id}
             component={Link}
-            to={`/product/${product.id}`}
+            to={`/products/${product.id}`}
             sx={{
               display: 'grid',
               gridTemplateColumns: isSmallScreen

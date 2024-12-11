@@ -22,3 +22,8 @@ Route::get('/', function () {
 Route::group(['prefix' => 'admin'], function () {
     Voyager::routes();
 });
+
+
+Route::get('/login', function () {
+    return redirect('/admin'); // Переадресация на /admin
+})->name('login');
