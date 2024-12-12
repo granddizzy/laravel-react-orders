@@ -6,7 +6,7 @@ import {
   Button, useTheme, useMediaQuery, MenuItem, FormControl, InputLabel, Select, TextField,
 } from '@mui/material';
 import {useDispatch, useSelector} from "react-redux";
-import {fetchProducts, setPageSize, setPage} from "../redux/productsSlice";
+import {fetchProducts, setPageSize, setPage, setSearch} from "../redux/productsSlice";
 import {useApi} from "../contexts/apiContext";
 import {Link} from "react-router-dom";
 import debounce from 'lodash.debounce';
@@ -14,11 +14,10 @@ import ProductsList from "./ProductsList"; // Импортируем debounce
 
 function Products() {
   const dispatch = useDispatch();
-  const {products, loading, error, currentPage, pageSize, totalPages} = useSelector((state) => state.products);
+  const {products, loading, error, currentPage, pageSize, totalPages, search} = useSelector((state) => state.products);
   const token = useSelector((state) => state.auth.token);
 
-  const [rawSearch, setRawSearch] = useState(""); // Ввод пользователя
-  const [debouncedSearch, setDebouncedSearch] = useState(""); // Дебаунс-значение для фильтрации
+  const [rawSearch, setRawSearch] = useState(search); // Ввод пользователя
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('md')); // Проверка на маленький экран
@@ -27,7 +26,7 @@ function Products() {
     const params = new URLSearchParams();
     params.append("page", currentPage);
     params.append("per_page", pageSize);
-    if (debouncedSearch) params.append("search", debouncedSearch); // Добавляем параметр поиска, если он есть
+    if (search) params.append("search", search); // Добавляем параметр поиска, если он есть
     return params.toString();
   };
 
@@ -39,7 +38,7 @@ function Products() {
       url: `${apiUrl}/products?${queryParams}`,
       token: token
     }));
-  }, [dispatch, currentPage, pageSize, debouncedSearch]);
+  }, [dispatch, currentPage, pageSize, search]);
 
 
   const handlePageSizeChange = (event) => {
@@ -48,7 +47,7 @@ function Products() {
 
   // Дебаунс-функция для обновления debouncedSearch
   const debouncedUpdateSearch = debounce((value) => {
-    setDebouncedSearch(value); // Обновляем debouncedSearch с задержкой
+    dispatch(setSearch(value));
   }, 1000);
 
   // Обработчик ввода в поле поиска

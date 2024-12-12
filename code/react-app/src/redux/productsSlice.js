@@ -26,6 +26,7 @@ const initialState = {
   currentPage: 1, // Текущая страница
   totalPages: 1, // Общее количество страниц
   pageSize: 10, // Количество продуктов на странице
+  search: '',
 };
 
 const productsSlice = createSlice({
@@ -40,7 +41,10 @@ const productsSlice = createSlice({
     },
     clearProducts: (state) => {
       state.products = []; // Очищаем список продуктов
-    }
+    },
+    setSearch: (state, action) => {
+      state.search = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -60,5 +64,5 @@ const productsSlice = createSlice({
   },
 });
 
-export const {setPage, clearProducts, setPageSize} = productsSlice.actions;
+export const {setPage, clearProducts, setPageSize, setSearch} = productsSlice.actions;
 export default productsSlice.reducer;
