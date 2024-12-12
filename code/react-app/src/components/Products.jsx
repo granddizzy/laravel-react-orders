@@ -58,9 +58,6 @@ function Products() {
     debouncedUpdateSearch(value); // Запускаем дебаунс
   };
 
-  // if (loading) return <div>Loading...</div>;
-  // if (error) return <div>Error: {error}</div>;
-
   return (
     <Box sx={{flexGrow: 1}}>
       <Typography variant="h4" gutterBottom>
