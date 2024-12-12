@@ -33,6 +33,8 @@ function ProductCreate() {
 
   const [error, setError] = useState(null);
 
+  const token = useSelector((state) => state.auth.token);
+
   // Обновление полей формы
   const handleChange = (event) => {
     const {name, value} = event.target;
@@ -47,12 +49,20 @@ function ProductCreate() {
     event.preventDefault();
     setIsLoading(true); // Включаем индикатор загрузки
     try {
-      const response = await fetch(`${apiUrl}/products`, {
+      // Базовые заголовки
+      const headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      };
+
+      // Добавление токена, если он есть
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`${apiUrl}/products/`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
+        headers,
         body: JSON.stringify(formData),
       });
 
