@@ -25,7 +25,7 @@ const initialState = {
   error: null,
   currentPage: 1, // Текущая страница
   totalPages: 1, // Общее количество страниц
-  pageSize: 20, // Количество продуктов на странице
+  pageSize: 10, // Количество продуктов на странице
 };
 
 const productsSlice = createSlice({
@@ -34,6 +34,9 @@ const productsSlice = createSlice({
   reducers: {
     setPage: (state, action) => {
       state.currentPage = action.payload; // Изменяем текущую страницу
+    },
+    setPageSize: (state, action) => {
+      state.pageSize = action.payload; // Изменяем размер страницы
     },
     clearProducts: (state) => {
       state.products = []; // Очищаем список продуктов
@@ -45,8 +48,9 @@ const productsSlice = createSlice({
         state.loading = true;
       })
       .addCase(fetchProducts.fulfilled, (state, action) => {
-        state.products = action.payload; // Обновляем список продуктов
-        // state.totalPages = action.payload.totalPages; // Обновляем количество страниц
+        state.products = action.payload.data; // Обновляем список продуктов
+        state.totalPages = action.payload.last_page; // Обновляем количество страниц
+        state.currentPage = action.payload.current_page;
         state.loading = false;
       })
       .addCase(fetchProducts.rejected, (state, action) => {
@@ -56,5 +60,5 @@ const productsSlice = createSlice({
   },
 });
 
-export const {setPage, clearProducts} = productsSlice.actions;
+export const {setPage, clearProducts, setPageSize} = productsSlice.actions;
 export default productsSlice.reducer;

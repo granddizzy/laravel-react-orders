@@ -11,10 +11,23 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-      $products = Product::all();
-      return response()->json($products);
+        // Валидируем входящие параметры
+        $validated = $request->validate([
+            'per_page' => 'integer|min:1|max:100', // Минимум 1, максимум 100 товаров на страницу
+            'page' => 'integer|min:1', // Минимум первая страница
+        ]);
+
+        // Получаем параметры пагинации из запроса (по умолчанию: 10 товаров на страницу и первая страница)
+        $perPage = $validated['per_page'] ?? 10;
+        $page = $validated['page'] ?? 1;
+
+        // Используем пагинацию для модели Product
+        $products = Product::paginate($perPage, ['*'], 'page', $page);
+
+        // Возвращаем данные в формате JSON
+        return response()->json($products);
     }
 
     /**

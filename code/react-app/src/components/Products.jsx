@@ -3,16 +3,16 @@ import React, {useEffect} from 'react';
 import {
   Typography,
   Box,
-  Button, useTheme, useMediaQuery,
+  Button, useTheme, useMediaQuery, MenuItem, FormControl, InputLabel, Select,
 } from '@mui/material';
 import {useDispatch, useSelector} from "react-redux";
-import {fetchProducts} from "../redux/productsSlice";
+import {fetchProducts, setPageSize, setPage} from "../redux/productsSlice";
 import {useApi} from "../contexts/apiContext";
 import {Link} from "react-router-dom";
 
 function Products() {
   const dispatch = useDispatch();
-  const {products, loading, error, currentPage, totalPages, setPage} = useSelector((state) => state.products);
+  const {products, loading, error, currentPage, pageSize, totalPages} = useSelector((state) => state.products);
   const token = useSelector((state) => state.auth.token);
 
   const theme = useTheme();
@@ -21,6 +21,7 @@ function Products() {
   const generateQueryParams = () => {
     const params = new URLSearchParams();
     params.append("page", currentPage);
+    params.append("per_page", pageSize);
 
     return params.toString();
   };
@@ -33,11 +34,15 @@ function Products() {
       url: `${apiUrl}/products?${queryParams}`,
       token: token
     }));
-  }, [dispatch, currentPage]);
+  }, [dispatch, currentPage, pageSize]);
 
 
   const handlePageChange = (page) => {
     dispatch(setPage(page)); // Изменяем текущую страницу
+  };
+
+  const handlePageSizeChange = (event) => {
+    dispatch(setPageSize(event.target.value)); // Изменяем размер страницы
   };
 
   if (loading) return <div>Loading...</div>;
@@ -51,17 +56,37 @@ function Products() {
       <Typography variant="body1" paragraph>
         Здесь отображается список товаров с их характеристиками.
       </Typography>
-      {/* Кнопка-ссылка */}
-      <Button
-        variant="contained"
-        color="primary"
-        component={Link}
-        to="/create-product"
-        sx={{mb: 2}}
-      >
-        Добавить новый продукт
-      </Button>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+        {/* Кнопка слева */}
+        <Button
+          variant="contained"
+          color="primary"
+          component={Link}
+          to="/create-product"
+        >
+          Добавить продукт
+        </Button>
 
+        {/* Выпадающий список справа */}
+        <FormControl sx={{ minWidth: 120 }}>
+          <InputLabel id="page-size-label">На странице</InputLabel>
+          <Select
+            labelId="page-size-label"
+            value={pageSize}
+            onChange={handlePageSizeChange}
+            label="На странице"
+          >
+            <MenuItem value={5}>5</MenuItem>
+            <MenuItem value={10}>10</MenuItem>
+            <MenuItem value={15}>15</MenuItem>
+            <MenuItem value={20}>20</MenuItem>
+            <MenuItem value={40}>40</MenuItem>
+            <MenuItem value={60}>60</MenuItem>
+            <MenuItem value={80}>80</MenuItem>
+            <MenuItem value={100}>100</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
 
       {/* Список товаров */}
       <Box sx={{border: '1px solid #ccc', borderRadius: 1, overflow: 'hidden'}}>
