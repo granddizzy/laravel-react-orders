@@ -18,7 +18,7 @@ return new class extends Migration
             $table->text('description')->nullable();  // Описание продукта
             $table->decimal('price', 10, 2);  // Цена продукта
             $table->string('unit')->nullable();  // Единица измерения (например, штука, кг, литр)
-            $table->integer('stock_quantity')->default(0);  // Количество на складе
+            $table->decimal('stock_quantity')->default(0);  // Количество на складе
             $table->string('sku')->nullable()->unique();  // Артикул продукта
             #$table->foreignId('category_id')->nullable()->constrained()->onDelete('set null');  // Категория продукта (если есть)
         });

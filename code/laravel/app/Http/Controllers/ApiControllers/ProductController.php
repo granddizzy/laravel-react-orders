@@ -49,8 +49,8 @@ class ProductController extends Controller
         'description' => 'nullable|string',
         'price' => 'required|numeric|min:0',
         'unit' => 'nullable|string',
-        'stock_quantity' => 'required|integer|min:0',
-//        'sku' => 'nullable|string|unique:products',  // Уникальность артикулов
+        'stock_quantity' => 'required|numeric|min:0',
+        'sku' => 'nullable|string|unique:products',  // Уникальность артикулов
       ]);
 
       // Создаем новый продукт
@@ -104,7 +104,7 @@ class ProductController extends Controller
         'description' => 'nullable|string',
         'price' => 'nullable|numeric|min:0',
         'unit' => 'nullable|string',
-        'stock_quantity' => 'nullable|integer|min:0',
+        'stock_quantity' => 'nullable|numeric|min:0',
         'sku' => 'nullable|string|unique:products,sku,' . $id,  // Уникальность артикулов с учетом текущего продукта
       ]);
 
