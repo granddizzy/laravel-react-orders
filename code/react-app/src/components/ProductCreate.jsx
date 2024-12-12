@@ -119,6 +119,14 @@ function ProductCreate() {
         rows={3}
       />
       <TextField
+        label="Артикул"
+        name="sku"
+        value={formData.sku}
+        onChange={handleChange}
+        required
+        fullWidth
+      />
+      <TextField
         label="Цена"
         name="price"
         value={formData.price}

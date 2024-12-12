@@ -139,7 +139,7 @@ function Products() {
                 <Box sx={{display: 'flex', flexDirection: 'column'}}>
                   <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
                     <Typography fontWeight="bold">Артикул:</Typography>
-                    <Typography>{product.article}</Typography>
+                    <Typography>{product.sku}</Typography>
                   </Box>
                   <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
                     <Typography fontWeight="bold">Наименование:</Typography>
@@ -151,7 +151,7 @@ function Products() {
                   </Box>
                   <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
                     <Typography fontWeight="bold">Количество:</Typography>
-                    <Typography>{product.quantity}</Typography>
+                    <Typography>{product.stock_quantity}</Typography>
                   </Box>
                   <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
                     <Typography fontWeight="bold">Ед. изм.:</Typography>
@@ -162,10 +162,10 @@ function Products() {
             ) : (
               // Для больших экранов показываем стандартную таблицу
               <>
-                <Typography>{product.article}</Typography>
+                <Typography>{product.sku}</Typography>
                 <Typography>{product.name}</Typography>
                 <Typography>{product.price}₽</Typography>
-                <Typography>{product.quantity}</Typography>
+                <Typography>{product.stock_quantity}</Typography>
                 <Typography>{product.unit}</Typography>
               </>
             )}
@@ -183,7 +183,7 @@ function Products() {
           Предыдущая
         </Button>
         <Typography variant="body1">
-          Страница {currentPage} из {totalPages}
+          {currentPage} из {totalPages}
         </Typography>
         <Button
           onClick={() => handlePageChange(currentPage + 1)}

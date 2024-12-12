@@ -91,6 +91,9 @@ function ProductView() {
               {product.description}
             </Typography>
             <Typography variant="body2" color="textSecondary">
+              Артикул: {product.sku}
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
               Цена: {product.price} ₽
             </Typography>
             <Typography variant="body2" color="textSecondary">
