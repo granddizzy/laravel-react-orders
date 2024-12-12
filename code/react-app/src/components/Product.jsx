@@ -105,7 +105,7 @@ function ProductView() {
         <Button
           variant="outlined"
           color="secondary"
-          onClick={() => navigate(-1)}
+          onClick={() => navigate("/catalog")}
         >
           Назад
         </Button>

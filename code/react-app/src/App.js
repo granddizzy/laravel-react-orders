@@ -36,7 +36,7 @@ function App() {
       <Box sx={{display: 'flex', flexDirection: 'column', minHeight: '100vh'}}>
         <Header/>
         <Box sx={{display: 'flex', flexGrow: 1}}>
-          {isDesktop && (
+          {auth.user && isDesktop && (
             <Box component="nav" sx={{width: 240, flexShrink: 0}}>
               <Sidebar/>
             </Box>
