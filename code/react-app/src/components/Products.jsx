@@ -6,7 +6,7 @@ import {
   Button, useTheme, useMediaQuery,
 } from '@mui/material';
 import {useDispatch, useSelector} from "react-redux";
-import {fetchProducts} from "../redux/productSlice";
+import {fetchProducts} from "../redux/productsSlice";
 import {useApi} from "../contexts/apiContext";
 import {Link} from "react-router-dom";
 

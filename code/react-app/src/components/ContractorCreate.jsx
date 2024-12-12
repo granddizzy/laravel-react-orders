@@ -12,7 +12,7 @@ import {
   TableRow, TableBody, TableContainer, Table, Paper, MenuItem, TextField
 } from '@mui/material';
 import {useDispatch, useSelector} from "react-redux";
-import {fetchProducts} from "../redux/productSlice";
+import {fetchProducts} from "../redux/productsSlice";
 import {useApi} from "../contexts/apiContext";
 import {Link, useNavigate} from "react-router-dom";
 

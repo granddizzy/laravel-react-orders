@@ -2,7 +2,7 @@ import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import axios from 'axios';
 
 export const fetchProducts = createAsyncThunk(
-  'product/fetchProducts',
+  'products/fetchProducts',
   async ({url, token}) => {
     try {
       // Формируем заголовки с токеном
