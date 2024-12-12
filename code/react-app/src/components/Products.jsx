@@ -9,7 +9,8 @@ import {useDispatch, useSelector} from "react-redux";
 import {fetchProducts, setPageSize, setPage} from "../redux/productsSlice";
 import {useApi} from "../contexts/apiContext";
 import {Link} from "react-router-dom";
-import debounce from 'lodash.debounce'; // Импортируем debounce
+import debounce from 'lodash.debounce';
+import ProductsList from "./ProductsList"; // Импортируем debounce
 
 function Products() {
   const dispatch = useDispatch();
@@ -41,10 +42,6 @@ function Products() {
   }, [dispatch, currentPage, pageSize, debouncedSearch]);
 
 
-  const handlePageChange = (page) => {
-    dispatch(setPage(page)); // Изменяем текущую страницу
-  };
-
   const handlePageSizeChange = (event) => {
     dispatch(setPageSize(event.target.value)); // Изменяем размер страницы
   };
@@ -61,8 +58,8 @@ function Products() {
     debouncedUpdateSearch(value); // Запускаем дебаунс
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  // if (loading) return <div>Loading...</div>;
+  // if (error) return <div>Error: {error}</div>;
 
   return (
     <Box sx={{flexGrow: 1}}>
@@ -72,7 +69,7 @@ function Products() {
       <Typography variant="body1" paragraph>
         Здесь отображается список товаров с их характеристиками.
       </Typography>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+      <Box sx={{display: 'flex', justifyContent: 'space-between', mb: 2}}>
         {/* Кнопка слева */}
         <Button
           variant="contained"
@@ -89,11 +86,11 @@ function Products() {
           variant="outlined"
           value={rawSearch} // Привязка к сырым данным
           onChange={handleSearchChange} // Обработчик с дебаунсом
-          sx={{ width: '250px' }} // Устанавливаем ширину поля
+          sx={{width: '250px'}} // Устанавливаем ширину поля
         />
 
         {/* Выпадающий список справа */}
-        <FormControl sx={{ minWidth: 120 }}>
+        <FormControl sx={{minWidth: 120}}>
           <InputLabel id="page-size-label">На странице</InputLabel>
           <Select
             labelId="page-size-label"
@@ -113,113 +110,9 @@ function Products() {
         </FormControl>
       </Box>
 
-      {/* Список товаров */}
-      <Box sx={{border: '1px solid #ccc', borderRadius: 1, overflow: 'hidden'}}>
-
-        {/* Заголовок таблицы */}
-        {isSmallScreen ? (
-          <></>) : (<Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: '150px 1fr 2fr 100px 100px 100px',
-            bgcolor: 'primary.main',
-            color: 'white',
-            p: 1,
-          }}
-        >
-          <Typography fontWeight="bold">Артикул</Typography>
-          <Typography fontWeight="bold">Наименование</Typography>
-          <Typography fontWeight="bold">Цена</Typography>
-          <Typography fontWeight="bold">Количество</Typography>
-          <Typography fontWeight="bold">Ед.изм.</Typography>
-        </Box>)}
-
-
-        {/* Список товаров */}
-        {products.map((product, index) => (
-          <Box
-            key={product.id}
-            component={Link}
-            to={`/products/${product.id}`}
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: isSmallScreen
-                ? '1fr' // Один столбец на маленьком экране
-                : '150px 1fr 2fr 100px 100px 100px', // Стандартное оформление на большом экране
-              textDecoration: 'none',
-              color: 'inherit',
-              p: 1,
-              bgcolor: index % 2 === 0 ? 'grey.50' : 'grey.100',
-              '&:hover': {
-                bgcolor: 'primary.light',
-                color: 'white',
-              },
-              borderBottom: '1px solid #eee',
-              transition: 'background-color 0.3s ease',
-            }}
-          >
-            {isSmallScreen ? (
-              // Для маленьких экранов показываем значения в виде "ключ: значение"
-              <>
-                <Box sx={{display: 'flex', flexDirection: 'column'}}>
-                  <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-                    <Typography fontWeight="bold">Артикул:</Typography>
-                    <Typography>{product.sku}</Typography>
-                  </Box>
-                  <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-                    <Typography fontWeight="bold">Наименование:</Typography>
-                    <Typography>{product.name}</Typography>
-                  </Box>
-                  <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-                    <Typography fontWeight="bold">Цена:</Typography>
-                    <Typography>{product.price}₽</Typography>
-                  </Box>
-                  <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-                    <Typography fontWeight="bold">Количество:</Typography>
-                    <Typography>{product.stock_quantity}</Typography>
-                  </Box>
-                  <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-                    <Typography fontWeight="bold">Ед. изм.:</Typography>
-                    <Typography>{product.unit}</Typography>
-                  </Box>
-                </Box>
-              </>
-            ) : (
-              // Для больших экранов показываем стандартную таблицу
-              <>
-                <Typography>{product.sku}</Typography>
-                <Typography>{product.name}</Typography>
-                <Typography>{product.price}₽</Typography>
-                <Typography>{product.stock_quantity}</Typography>
-                <Typography>{product.unit}</Typography>
-              </>
-            )}
-          </Box>
-        ))}
-      </Box>
-
-      {/* Пагинация */
-      }
-      <Box sx={{mt: 3, display: 'flex', justifyContent: 'space-between'}}>
-        <Button
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          Предыдущая
-        </Button>
-        <Typography variant="body1">
-          {currentPage} из {totalPages}
-        </Typography>
-        <Button
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-        >
-          Следующая
-        </Button>
-      </Box>
+      <ProductsList loading={loading}/>
     </Box>
-  )
-    ;
+  );
 }
 
 export default Products;
