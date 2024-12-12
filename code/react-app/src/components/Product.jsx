@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Typography,
   Box,
@@ -7,12 +7,13 @@ import {
   CardContent,
   CardMedia,
 } from '@mui/material';
-import {useNavigate, useParams} from 'react-router-dom';
-import {useApi} from '../contexts/apiContext';
-import {useSelector} from "react-redux";
+import { useNavigate, useParams } from 'react-router-dom';
+import { useApi } from '../contexts/apiContext';
+import { useSelector } from "react-redux";
+import defaultImage from '../img/default-product-image.png'; // Импорт заглушки
 
 function ProductView() {
-  const {productId} = useParams(); // Получаем id продукта из URL
+  const { productId } = useParams(); // Получаем id продукта из URL
   const navigate = useNavigate();
   const apiUrl = useApi();
   const [isLoading, setIsLoading] = useState(false);
@@ -26,9 +27,9 @@ function ProductView() {
     const fetchProduct = async () => {
       setIsLoading(true);
       try {
-        const headers = token ? {Authorization: `Bearer ${token}`} : {};
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
         const response = await fetch(`${apiUrl}/products/${productId}`, {
-          method: 'GET',  // Указываем метод запроса, по умолчанию 'GET'
+          method: 'GET', // Указываем метод запроса, по умолчанию 'GET'
           headers, // Заголовки, включая токен, если он есть
         });
         if (!response.ok) {
@@ -76,12 +77,11 @@ function ProductView() {
 
       {product && (
         <Card>
-          {/* Здесь можно добавить изображение продукта, если оно есть */}
           <CardMedia
             component="img"
             alt={product.name}
-            height="140"
-            image={product.image || 'default-image.jpg'} // Поставьте картинку по умолчанию, если изображения нет
+            height="340"
+            image={product.image || defaultImage} // Используем заглушку, если изображения нет
           />
           <CardContent>
             <Typography variant="h6" gutterBottom>
