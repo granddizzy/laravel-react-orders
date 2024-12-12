@@ -1,23 +1,21 @@
 // src/Products.jsx
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {
   Typography,
   Box,
-  Button, useTheme, useMediaQuery, MenuItem, FormControl, InputLabel, Select, TextField,
+  Button, useTheme, useMediaQuery, MenuItem, FormControl, InputLabel, Select,
 } from '@mui/material';
 import {useDispatch, useSelector} from "react-redux";
-import {fetchProducts, setPageSize, setPage, setSearch} from "../redux/productsSlice";
+import {fetchProducts, setPageSize} from "../redux/productsSlice";
 import {useApi} from "../contexts/apiContext";
 import {Link} from "react-router-dom";
-import debounce from 'lodash.debounce';
-import ProductsList from "./ProductsList"; // Импортируем debounce
+import ProductsList from "./ProductsList";
+import ProductsSearch from "./ProductsSearch"; // Импортируем debounce
 
 function Products() {
   const dispatch = useDispatch();
-  const {products, loading, error, currentPage, pageSize, totalPages, search} = useSelector((state) => state.products);
+  const {loading, currentPage, pageSize, search} = useSelector((state) => state.products);
   const token = useSelector((state) => state.auth.token);
-
-  const [rawSearch, setRawSearch] = useState(search); // Ввод пользователя
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('md')); // Проверка на маленький экран
@@ -40,25 +38,12 @@ function Products() {
     }));
   }, [dispatch, currentPage, pageSize, search]);
 
-
   const handlePageSizeChange = (event) => {
     dispatch(setPageSize(event.target.value)); // Изменяем размер страницы
   };
 
-  // Дебаунс-функция для обновления debouncedSearch
-  const debouncedUpdateSearch = debounce((value) => {
-    dispatch(setSearch(value));
-  }, 1000);
-
-  // Обработчик ввода в поле поиска
-  const handleSearchChange = (event) => {
-    const value = event.target.value;
-    setRawSearch(value); // Сразу обновляем сырое значение
-    debouncedUpdateSearch(value); // Запускаем дебаунс
-  };
-
   return (
-    <Box sx={{ flexGrow: 1 }}>
+    <Box sx={{flexGrow: 1}}>
       <Typography variant="h4" gutterBottom>
         Номенклатура
       </Typography>
@@ -67,7 +52,7 @@ function Products() {
       </Typography>
 
       {/* Кнопка и выпадающий список */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+      <Box sx={{display: 'flex', justifyContent: 'space-between', mb: 2}}>
         <Button
           variant="contained"
           color="primary"
@@ -77,7 +62,7 @@ function Products() {
           Добавить продукт
         </Button>
 
-        <FormControl sx={{ minWidth: 120 }}>
+        <FormControl sx={{minWidth: 120}}>
           <InputLabel id="page-size-label">На странице</InputLabel>
           <Select
             labelId="page-size-label"
@@ -97,18 +82,8 @@ function Products() {
         </FormControl>
       </Box>
 
-      {/* Поле поиска */}
-      <Box sx={{ mb: 2 }}>
-        <TextField
-          label="Поиск"
-          variant="outlined"
-          value={rawSearch}
-          onChange={handleSearchChange}
-          sx={{ width: '100%' }} // Полная ширина блока
-        />
-      </Box>
-
-      <ProductsList loading={loading} />
+      <ProductsSearch/>
+      <ProductsList loading={loading}/>
     </Box>
   );
 
