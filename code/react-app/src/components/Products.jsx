@@ -59,15 +59,16 @@ function Products() {
   };
 
   return (
-    <Box sx={{flexGrow: 1}}>
+    <Box sx={{ flexGrow: 1 }}>
       <Typography variant="h4" gutterBottom>
         Номенклатура
       </Typography>
       <Typography variant="body1" paragraph>
         Здесь отображается список товаров с их характеристиками.
       </Typography>
-      <Box sx={{display: 'flex', justifyContent: 'space-between', mb: 2}}>
-        {/* Кнопка слева */}
+
+      {/* Кнопка и выпадающий список */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
         <Button
           variant="contained"
           color="primary"
@@ -77,17 +78,7 @@ function Products() {
           Добавить продукт
         </Button>
 
-        {/* Поле поиска */}
-        <TextField
-          label="Поиск"
-          variant="outlined"
-          value={rawSearch} // Привязка к сырым данным
-          onChange={handleSearchChange} // Обработчик с дебаунсом
-          sx={{width: '250px'}} // Устанавливаем ширину поля
-        />
-
-        {/* Выпадающий список справа */}
-        <FormControl sx={{minWidth: 120}}>
+        <FormControl sx={{ minWidth: 120 }}>
           <InputLabel id="page-size-label">На странице</InputLabel>
           <Select
             labelId="page-size-label"
@@ -107,9 +98,21 @@ function Products() {
         </FormControl>
       </Box>
 
-      <ProductsList loading={loading}/>
+      {/* Поле поиска */}
+      <Box sx={{ mb: 2 }}>
+        <TextField
+          label="Поиск"
+          variant="outlined"
+          value={rawSearch}
+          onChange={handleSearchChange}
+          sx={{ width: '100%' }} // Полная ширина блока
+        />
+      </Box>
+
+      <ProductsList loading={loading} />
     </Box>
   );
+
 }
 
 export default Products;
