@@ -17,14 +17,27 @@ class ProductController extends Controller
         $validated = $request->validate([
             'per_page' => 'integer|min:1|max:100', // Минимум 1, максимум 100 товаров на страницу
             'page' => 'integer|min:1', // Минимум первая страница
+            'search' => 'nullable|string', // Параметр поиска (по наименованию или SKU)
         ]);
 
         // Получаем параметры пагинации из запроса (по умолчанию: 10 товаров на страницу и первая страница)
         $perPage = $validated['per_page'] ?? 10;
         $page = $validated['page'] ?? 1;
+        $search = $validated['search'] ?? null;
 
-        // Используем пагинацию для модели Product
-        $products = Product::paginate($perPage, ['*'], 'page', $page);
+        // Строим запрос
+        $query = Product::query();
+
+        // Если есть строка для поиска, добавляем фильтрацию по полям 'name' и 'sku'
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('sku', 'like', '%' . $search . '%');
+            });
+        }
+
+        // Применяем пагинацию
+        $products = $query->paginate($perPage, ['*'], 'page', $page);
 
         // Возвращаем данные в формате JSON
         return response()->json($products);
