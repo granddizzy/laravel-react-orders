@@ -98,7 +98,7 @@ const Login = () => {
           to="/register"
           variant="text"
           color="secondary"
-          sx={{mt: 2}}
+          sx={{mt: 2, color: '#1976d2'}}
         >
           Зарегистрироваться
         </Button>
