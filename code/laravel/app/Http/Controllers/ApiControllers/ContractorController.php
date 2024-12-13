@@ -11,9 +11,39 @@ class ContractorController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $contractors = Contractor::all();
+        // Валидируем входящие параметры
+        $validated = $request->validate([
+            'per_page' => 'integer|min:1|max:100', // Минимум 1, максимум 100 элементов на страницу
+            'page' => 'integer|min:1', // Минимум первая страница
+            'search' => 'nullable|string', // Параметр поиска (по наименованию или другим данным)
+        ]);
+
+        // Получаем параметры пагинации и поиска из запроса
+        $perPage = $validated['per_page'] ?? 10;
+        $page = $validated['page'] ?? 1;
+        $search = $validated['search'] ?? null;
+
+        // Строим запрос
+        $query = Contractor::query();
+
+        // Если есть строка для поиска, добавляем фильтрацию
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%') // Пример: поиск по имени
+                ->orWhere('unp', 'like', '%' . $search . '%') // Пример: поиск по sku
+                ->orWhere('email', 'like', '%' . $search . '%') // Пример: поиск по email
+                ->orWhere('phone', 'like', '%' . $search . '%') // Пример: поиск по email
+                ->orWhere('contact_person', 'like', '%' . $search . '%') // Пример: поиск по email
+                ->orWhere('phone', 'like', '%' . $search . '%'); // Пример: поиск по телефону
+            });
+        }
+
+        // Применяем пагинацию
+        $contractors = $query->paginate($perPage, ['*'], 'page', $page);
+
+        // Возвращаем данные в формате JSON
         return response()->json($contractors);
     }
 

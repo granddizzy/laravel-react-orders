@@ -1,22 +1,37 @@
 // src/Contractors.jsx
 import React, {useEffect} from 'react';
-import {Typography, Box, Button} from '@mui/material';
+import {
+  Typography,
+  Box,
+  Button,
+  useTheme,
+  useMediaQuery,
+  InputLabel,
+  Select,
+  MenuItem,
+  FormControl
+} from '@mui/material';
 import {useDispatch, useSelector} from "react-redux";
 import {useApi} from "../contexts/apiContext";
-import {fetchProducts} from "../redux/productsSlice";
 import {Link} from "react-router-dom";
-import {fetchContractors} from "../redux/contractorsSlice";
+import {fetchContractors, setPageSize} from "../redux/contractorsSlice";
+import ContractorsList from "./ContractorsList";
+import ContractorsSearch from "./ContractorsSearch";
 
 function Contractors() {
-
   const dispatch = useDispatch();
-  const {contractors, loading, error, currentPage, totalPages, setPage} = useSelector((state) => state.contractors);
+  const {loading, currentPage, pageSize, search} = useSelector((state) => state.contractors);
   const token = useSelector((state) => state.auth.token);
+
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   const generateQueryParams = () => {
     const params = new URLSearchParams();
     params.append("page", currentPage);
-
+    params.append("page", currentPage);
+    params.append("per_page", pageSize);
+    if (search) params.append("search", search);
     return params.toString();
   };
 
@@ -28,15 +43,11 @@ function Contractors() {
       url: `${apiUrl}/contractors?${queryParams}`,
       token: token
     }));
-  }, [dispatch, currentPage]);
+  }, [dispatch, currentPage, pageSize, search]);
 
-
-  const handlePageChange = (page) => {
-    dispatch(setPage(page)); // Изменяем текущую страницу
+  const handlePageSizeChange = (event) => {
+    dispatch(setPageSize(event.target.value)); // Изменяем размер страницы
   };
-
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
 
   return (
     <Box sx={{flexGrow: 1}}>
@@ -46,84 +57,40 @@ function Contractors() {
       <Typography variant="body1" paragraph>
         Здесь отображается список контрагентов с их характеристиками.
       </Typography>
-      {/* Кнопка-ссылка */}
-      <Button
-        variant="contained"
-        color="primary"
-        component={Link}
-        to="/create-contractor"
-        sx={{mb: 2}}
-      >
-        Создать нового контрагента
-      </Button>
 
-      {/* Список контрагентов */}
-      <Box sx={{border: '1px solid #ccc', borderRadius: 1, overflow: 'hidden'}}>
-        {/* Заголовок таблицы */}
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: '2fr 1fr 3fr 1.5fr 2fr',
-            bgcolor: 'primary.main',
-            color: 'white',
-            p: 1,
-          }}
+      {/* Кнопка и выпадающий список */}
+      <Box sx={{display: 'flex', justifyContent: 'space-between', mb: 2}}>
+        <Button
+          variant="contained"
+          color="primary"
+          component={Link}
+          to="/create-contractor"
         >
-          <Typography fontWeight="bold">Наименование</Typography>
-          <Typography fontWeight="bold">УНП</Typography>
-          <Typography fontWeight="bold">Адрес</Typography>
-          <Typography fontWeight="bold">Телефон</Typography>
-          <Typography fontWeight="bold">Email</Typography>
-        </Box>
+          Добавить контрагента
+        </Button>
 
-        {/* Список контрагентов */}
-        {contractors.map((contractor, index) => (
-          <Box
-            key={contractor.id}
-            component={Link}
-            to={`/contractor/${contractor.id}`}
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: '2fr 1fr 3fr 1.5fr 2fr',
-              textDecoration: 'none',
-              color: 'inherit',
-              p: 1,
-              bgcolor: index % 2 === 0 ? 'grey.50' : 'grey.100', // Чередование строк
-              '&:hover': {
-                bgcolor: 'primary.light', // Яркий фон при наведении
-                color: 'white',
-              },
-              borderBottom: '1px solid #eee',
-              transition: 'background-color 0.3s ease', // Плавный переход
-            }}
+        <FormControl sx={{minWidth: 120}}>
+          <InputLabel id="page-size-label">На странице</InputLabel>
+          <Select
+            labelId="page-size-label"
+            value={pageSize}
+            onChange={handlePageSizeChange}
+            label="На странице"
           >
-            <Typography>{contractor.name}</Typography>
-            <Typography>{contractor.unp}</Typography>
-            <Typography>{contractor.address}</Typography>
-            <Typography>{contractor.phone}</Typography>
-            <Typography>{contractor.email}</Typography>
-          </Box>
-        ))}
+            <MenuItem value={5}>5</MenuItem>
+            <MenuItem value={10}>10</MenuItem>
+            <MenuItem value={15}>15</MenuItem>
+            <MenuItem value={20}>20</MenuItem>
+            <MenuItem value={40}>40</MenuItem>
+            <MenuItem value={60}>60</MenuItem>
+            <MenuItem value={80}>80</MenuItem>
+            <MenuItem value={100}>100</MenuItem>
+          </Select>
+        </FormControl>
       </Box>
 
-      {/* Пагинация */}
-      <Box sx={{mt: 3, display: 'flex', justifyContent: 'space-between'}}>
-        <Button
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          Предыдущая
-        </Button>
-        <Typography variant="body1">
-          Страница {currentPage} из {totalPages}
-        </Typography>
-        <Button
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-        >
-          Следующая
-        </Button>
-      </Box>
+      <ContractorsSearch/>
+      <ContractorsList loading={loading}/>
     </Box>
   );
 }

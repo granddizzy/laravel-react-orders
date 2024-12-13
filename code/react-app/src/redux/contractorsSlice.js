@@ -25,7 +25,8 @@ const initialState = {
   error: null,
   currentPage: 1, // Текущая страница
   totalPages: 1, // Общее количество страниц
-  pageSize: 20, // Количество продуктов на странице
+  pageSize: 10, // Количество на странице
+  search: '',
 };
 
 const contractorsSlice = createSlice({
@@ -35,9 +36,15 @@ const contractorsSlice = createSlice({
     setPage: (state, action) => {
       state.currentPage = action.payload; // Изменяем текущую страницу
     },
+    setPageSize: (state, action) => {
+      state.pageSize = action.payload; // Изменяем размер страницы
+    },
     clearContractors: (state) => {
       state.contractors = []; // Очищаем список
-    }
+    },
+    setSearch: (state, action) => {
+      state.search = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -45,8 +52,9 @@ const contractorsSlice = createSlice({
         state.loading = true;
       })
       .addCase(fetchContractors.fulfilled, (state, action) => {
-        state.contractors = action.payload; // Обновляем список
-        // state.totalPages = action.payload.totalPages; // Обновляем количество страниц
+        state.contractors = action.payload.data; // Обновляем список
+        state.totalPages = action.payload.last_page; // Обновляем количество страниц
+        state.currentPage = action.payload.current_page;
         state.loading = false;
       })
       .addCase(fetchContractors.rejected, (state, action) => {
@@ -56,5 +64,5 @@ const contractorsSlice = createSlice({
   },
 });
 
-export const {setPage, clearContractors} = contractorsSlice.actions;
+export const {setPage, clearContractors, setPageSize, setSearch} = contractorsSlice.actions;
 export default contractorsSlice.reducer;
