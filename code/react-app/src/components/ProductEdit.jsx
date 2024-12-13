@@ -134,7 +134,6 @@ function ProductEdit() {
         name="description"
         value={formData.description}
         onChange={handleChange}
-        required
         fullWidth
         multiline
         rows={3}
@@ -144,7 +143,6 @@ function ProductEdit() {
         name="sku"
         value={formData.sku}
         onChange={handleChange}
-        required
         fullWidth
       />
       <TextField

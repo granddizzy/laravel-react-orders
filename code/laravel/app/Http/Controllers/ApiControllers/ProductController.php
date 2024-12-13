@@ -61,7 +61,7 @@ class ProductController extends Controller
         'name' => 'required|string|max:255',
         'description' => 'nullable|string',
         'price' => 'required|numeric|min:0',
-        'unit' => 'nullable|string',
+        'unit' => 'required|nullable|string',
         'stock_quantity' => 'required|numeric|min:0',
         'sku' => 'nullable|string|unique:products',  // Уникальность артикулов
       ]);

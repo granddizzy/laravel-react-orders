@@ -25,7 +25,7 @@ const initialState = {
   error: null,
   currentPage: 1, // Текущая страница
   totalPages: 1, // Общее количество страниц
-  pageSize: 10, // Количество продуктов на странице
+  pageSize: 10, // Количество на странице
   search: '',
 };
 
