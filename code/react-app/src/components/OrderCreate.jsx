@@ -110,7 +110,7 @@ function OrderCreate() {
     event.preventDefault();
     setIsLoading(true);
     try {
-      // console.log(order)
+      console.log(order)
       const headers = {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -122,7 +122,7 @@ function OrderCreate() {
         body: JSON.stringify(order),
       });
 
-      // console.log(response);
+      console.log(response);
 
       if (!response.ok) {
         throw new Error('Ошибка при создании заказа.');

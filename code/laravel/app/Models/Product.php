@@ -19,10 +19,13 @@ class Product extends Model {
 
     public function orders()
     {
-        return $this->hasMany(Order::class);
+        return $this->belongsToMany(Order::class)
+            ->withPivot('quantity')
+            ->withTimestamps();
     }
 
-//    public function category() {
+
+    //    public function category() {
 //        return $this->belongsTo(Category::class);
 //    }
 //

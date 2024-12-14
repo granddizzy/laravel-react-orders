@@ -5,6 +5,7 @@ namespace app\Http\Controllers\ApiControllers;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller {
     /**
@@ -64,7 +65,7 @@ class OrderController extends Controller {
         $query = Order::query();
 
         // Подгружаем связанные данные
-        $query->with(['contractor']);
+        $query->with(['contractor', 'products']);
 
         // Фильтрация по строке поиска, если она задана
         if ($search) {
@@ -101,19 +102,21 @@ class OrderController extends Controller {
             //            'status' => 'required|in:pending,confirmed,shipped,completed,cancelled',
             //            'total_amount' => 'required|numeric',
             'shipping_address' => 'nullable|string',
-//            'billing_address' => 'nullable|string',
+            //            'billing_address' => 'nullable|string',
             //            'ordered_at' => 'nullable|date',
             //            'shipped_at' => 'nullable|date',
             //            'completed_at' => 'nullable|date',
             //            'organization_id' => 'required|exists:organizations,id',  // Привязка к организации
             'contractor_id' => 'required|exists:contractors,id',  // Привязка к контрагенту
-//            'products' => 'required|array',  // Продукты, связанные с заказом
-            //            'products.*.product_id' => 'required|exists:products,id',  // Каждый продукт должен существовать
-            //            'products.*.quantity' => 'required|integer|min:1',  // Количество каждого продукта
+            'products' => 'required|array',  // Продукты, связанные с заказом
+            'products.*.product_id' => 'required|exists:products,id',  // Каждый продукт должен существовать
+            'products.*.quantity' => 'required|integer|min:1',  // Количество каждого продукта
         ]);
 
+        $products = $request->input('products', []);
+
         // Создаем заказ
-//        $order = Order::create($validated);
+        //        $order = Order::create($validated);
         //
         //        // Привязываем продукты к заказу (через pivot таблицу)
         //        foreach ($request->products as $product) {
@@ -123,15 +126,32 @@ class OrderController extends Controller {
         ////                'total' => $product['quantity'] * $product['price'],  // Общая сумма за продукт
         //            ]);
         //        }
-        $order = Order::create([
-            'manager_id' => $validated['manager_id'],
-            'shipping_address' => $validated['shipping_address'],
-//            'billing_address' => $validated['billing_address'],
-            'contractor_id' => $validated['contractor_id'],
-            // Здесь могут быть другие поля, например, дата создания или статус
-        ]);
 
-        return response()->json($order, 201);
+        // Используем транзакцию
+        DB::beginTransaction();
+
+        try {
+            $order = Order::create([
+                'manager_id' => $validated['manager_id'],
+                'shipping_address' => $validated['shipping_address'],
+                //            'billing_address' => $validated['billing_address'],
+                'contractor_id' => $validated['contractor_id'],
+                // Здесь могут быть другие поля, например, дата создания или статус
+            ]);
+
+            // Привязываем продукты к заказу
+            foreach ($products as $product) {
+                $order->products()->attach($product['product_id'], [
+                    'quantity' => $product['quantity'], // Указываем количество
+                    // Вы можете добавить дополнительные данные, такие как цена или скидка
+                ]);
+            }
+            DB::commit(); // Фиксируем транзакцию
+            return response()->json($order, 201);
+        } catch (\Exception $e) {
+            DB::rollBack(); // Откатываем транзакцию в случае ошибки
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
