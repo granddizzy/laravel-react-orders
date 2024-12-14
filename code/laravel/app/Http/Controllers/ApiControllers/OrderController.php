@@ -73,7 +73,15 @@ class OrderController extends Controller {
                 // Фильтрация по полям самого заказа
                 $q->where('shipping_address', 'like', '%' . $search . '%')  // Поиск по адресу доставки
                 ->orWhere('billing_address', 'like', '%' . $search . '%')  // Поиск по адресу для счета
-                ->orWhere('id', 'like', '%' . $search . '%');  // Поиск по ID заказа
+                ->orWhere('id', 'like', '%' . $search . '%')  // Поиск по ID заказа
+                // Фильтрация по имени контрагента
+                ->orWhereHas('contractor', function ($query) use ($search) {
+                    $query->where('name', 'like', '%' . $search . '%');
+                })
+                    // Фильтрация по имени продукта
+                    ->orWhereHas('products', function ($query) use ($search) {
+                        $query->where('name', 'like', '%' . $search . '%');
+                    });
             });
         }
 
@@ -153,7 +161,7 @@ class OrderController extends Controller {
      */
     public function show(string $id) {
         // Получаем заказ по ID
-        $order = Order::with('products')->find($id);
+        $order = Order::with('contractor', 'products')->find($id);
 
         // Если заказ не найден, возвращаем ошибку
         if (!$order) {

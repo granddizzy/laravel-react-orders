@@ -10,11 +10,25 @@ import {useSelector} from "react-redux";
 import {Link} from "react-router-dom";
 import OrdersPagination from "./OrdersPagination";
 
+// Маппинг статусов на русский
+const statusMap = {
+  pending: 'Ожидает',
+  confirmed: 'Подтвержден',
+  shipped: 'Отправлен',
+  completed: 'Завершен',
+  cancelled: 'Отменен',
+};
+
 function OrdersList({loading}) {
   const {orders} = useSelector((state) => state.orders);
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('md')); // Проверка на маленький экран
+
+  // Функция для получения статуса на русском
+  const getStatusInRussian = (status) => {
+    return statusMap[status] || status; // Если статус не найден, выводим исходный
+  };
 
   if (loading) return <div>Загрузка...</div>;
 
@@ -34,9 +48,9 @@ function OrdersList({loading}) {
         >
           <Typography fontWeight="bold">Номер</Typography>
           <Typography fontWeight="bold">Контрагент</Typography>
-          <Typography fontWeight="bold">Менеджер</Typography>
+          {/*<Typography fontWeight="bold">Менеджер</Typography>*/}
           <Typography fontWeight="bold">Статус</Typography>
-          <Typography fontWeight="bold">Адрес доставки</Typography>
+          <Typography fontWeight="bold">Сумма</Typography>
         </Box>
 
         {/* Список товаров */}
@@ -61,10 +75,11 @@ function OrdersList({loading}) {
             }}
           >
             <Typography>{order.id}</Typography>
-            <Typography>{order.contractor_id}</Typography>
-            <Typography>{order.manager_id}</Typography>
-            <Typography>{order.status}</Typography>
-            <Typography>{order.shipping_address}</Typography>
+            <Typography>{order.contractor.name}</Typography>
+            {/*<Typography>order.manager.name</Typography>*/}
+            <Typography>{getStatusInRussian(order.status)}</Typography>
+            <Typography>{order.total_amount}</Typography>
+            {/*<Typography>{order.shipping_address}</Typography>*/}
           </Box>
         ))}
       </Box>

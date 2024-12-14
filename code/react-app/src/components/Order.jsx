@@ -1,11 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { Typography, Box, Button, Card, CardContent } from '@mui/material';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useApi } from '../contexts/apiContext';
-import { useSelector } from 'react-redux';
+import React, {useEffect, useState} from 'react';
+import {Typography, Box, Button, Card, CardContent} from '@mui/material';
+import {useNavigate, useParams} from 'react-router-dom';
+import {useApi} from '../contexts/apiContext';
+import {useSelector} from 'react-redux';
+
+// Маппинг статусов на русский
+const statusMap = {
+  pending: 'Ожидает',
+  confirmed: 'Подтвержден',
+  shipped: 'Отправлен',
+  completed: 'Завершен',
+  cancelled: 'Отменен',
+};
 
 function OrderView() {
-  const { orderId } = useParams(); // Получаем id заказа из URL
+  const {orderId} = useParams(); // Получаем id заказа из URL
   const navigate = useNavigate();
   const apiUrl = useApi();
   const [isLoading, setIsLoading] = useState(false);
@@ -14,12 +23,17 @@ function OrderView() {
 
   const token = useSelector((state) => state.auth.token);
 
+  // Функция для получения статуса на русском
+  const getStatusInRussian = (status) => {
+    return statusMap[status] || status; // Если статус не найден, выводим исходный
+  };
+
   // Функция для загрузки данных о заказе
   useEffect(() => {
     const fetchOrder = async () => {
       setIsLoading(true);
       try {
-        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const headers = token ? {Authorization: `Bearer ${token}`} : {};
         const response = await fetch(`${apiUrl}/orders/${orderId}`, {
           method: 'GET', // Указываем метод запроса, по умолчанию 'GET'
           headers, // Заголовки, включая токен, если он есть
@@ -72,13 +86,13 @@ function OrderView() {
               Дата создания: {new Date(order.created_at).toLocaleDateString()}
             </Typography>
             <Typography variant="body2" color="textSecondary">
-              Статус: {order.status}
+              Статус: {getStatusInRussian(order.status)}
             </Typography>
             <Typography variant="body2" color="textSecondary">
-              Менеджер: {order.manager_id}
+              Менеджер: {''}
             </Typography>
             <Typography variant="body2" color="textSecondary">
-              Контрагент: {order.contractor_id}
+              Контрагент: {order.contractor.name}
             </Typography>
             <Typography variant="body2" color="textSecondary">
               Сумма: {order.total_amount} ₽
@@ -104,7 +118,7 @@ function OrderView() {
       )}
 
       {/* Кнопка "Назад" */}
-      <Box sx={{ mt: 2 }}>
+      <Box sx={{mt: 2}}>
         <Button
           variant="outlined"
           color="secondary"
