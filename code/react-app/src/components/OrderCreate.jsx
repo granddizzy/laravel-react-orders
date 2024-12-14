@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   Typography,
   Box,
@@ -16,8 +16,9 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import Autocomplete from '@mui/material/Autocomplete';
 import CircularProgress from '@mui/material/CircularProgress';
-import { useApi } from '../contexts/apiContext';
+import {useApi} from '../contexts/apiContext';
 import {useNavigate} from "react-router-dom";
+import {useSelector} from "react-redux";
 
 function OrderCreate() {
   const apiUrl = useApi();
@@ -35,14 +36,19 @@ function OrderCreate() {
   });
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const token = useSelector((state) => state.auth.token);
 
   // Поиск контрагентов
   const fetchContractors = async (search = '') => {
     setLoadingContractors(true);
     try {
-      const response = await fetch(`${apiUrl}/contractors?search=${search}`);
+      const headers = token ? {Authorization: `Bearer ${token}`} : {};
+      const response = await fetch(`${apiUrl}/contractors?search=${search}`, {
+        method: 'GET',  // Указываем метод запроса, по умолчанию 'GET'
+        headers, // Заголовки, включая токен, если он есть
+      });
       const result = await response.json();
-      setContractorOptions(result);
+      setContractorOptions(result.data);
     } catch {
       setContractorOptions([]);
     } finally {
@@ -54,9 +60,13 @@ function OrderCreate() {
   const fetchProducts = async (search = '') => {
     setLoadingProducts(true);
     try {
-      const response = await fetch(`${apiUrl}/products?search=${search}`);
+      const headers = token ? {Authorization: `Bearer ${token}`} : {};
+      const response = await fetch(`${apiUrl}/products?search=${search}`, {
+        method: 'GET',  // Указываем метод запроса, по умолчанию 'GET'
+        headers, // Заголовки, включая токен, если он есть
+      });
       const result = await response.json();
-      setProductOptions(result);
+      setProductOptions(result.data);
     } catch {
       setProductOptions([]);
     } finally {
@@ -78,7 +88,7 @@ function OrderCreate() {
   const handleAddItem = () => {
     setOrder((prev) => ({
       ...prev,
-      products: [...prev.products, { product_id: null, quantity: 1 }],
+      products: [...prev.products, {product_id: null, quantity: 1}],
     }));
   };
 
@@ -86,13 +96,13 @@ function OrderCreate() {
   const handleItemChange = (index, field, value) => {
     const updatedItems = [...order.products];
     updatedItems[index][field] = field === 'quantity' ? Number(value) : value;
-    setOrder((prev) => ({ ...prev, products: updatedItems }));
+    setOrder((prev) => ({...prev, products: updatedItems}));
   };
 
   // Удаление позиции из заказа
   const handleRemoveItem = (index) => {
     const updatedItems = order.products.filter((_, i) => i !== index);
-    setOrder((prev) => ({ ...prev, products: updatedItems }));
+    setOrder((prev) => ({...prev, products: updatedItems}));
   };
 
   // Отправка формы
@@ -100,15 +110,19 @@ function OrderCreate() {
     event.preventDefault();
     setIsLoading(true);
     try {
-      console.log(order)
+      // console.log(order)
+      const headers = {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      };
       const response = await fetch(`${apiUrl}/orders`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
+        headers,
         body: JSON.stringify(order),
       });
+
+      // console.log(response);
 
       if (!response.ok) {
         throw new Error('Ошибка при создании заказа.');
@@ -146,7 +160,7 @@ function OrderCreate() {
         getOptionLabel={(option) => option.name}
         onInputChange={handleContractorSearch}
         onChange={(event, value) => {
-          setOrder((prev) => ({ ...prev, contractor_id: value?.id || null }));
+          setOrder((prev) => ({...prev, contractor_id: value?.id || null}));
         }}
         loading={loadingContractors}
         renderInput={(params) => (
@@ -158,7 +172,7 @@ function OrderCreate() {
               ...params.InputProps,
               endAdornment: (
                 <>
-                  {loadingContractors ? <CircularProgress size={20} /> : null}
+                  {loadingContractors ? <CircularProgress size={20}/> : null}
                   {params.InputProps.endAdornment}
                 </>
               ),
@@ -198,7 +212,7 @@ function OrderCreate() {
                           endAdornment: (
                             <>
                               {loadingProducts ? (
-                                <CircularProgress size={20} />
+                                <CircularProgress size={20}/>
                               ) : null}
                               {params.InputProps.endAdornment}
                             </>
@@ -220,7 +234,7 @@ function OrderCreate() {
                 </TableCell>
                 <TableCell>
                   <IconButton onClick={() => handleRemoveItem(index)}>
-                    <DeleteIcon />
+                    <DeleteIcon/>
                   </IconButton>
                 </TableCell>
               </TableRow>

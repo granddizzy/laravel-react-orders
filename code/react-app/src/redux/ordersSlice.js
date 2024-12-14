@@ -7,7 +7,6 @@ export const fetchOrders = createAsyncThunk(
     try {
       // Формируем заголовки с токеном
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
-
       const response = await axios.get(url, {headers});
       if (response.status !== 200) {
         throw new Error(`Error: ${response.statusText}`);
@@ -25,7 +24,8 @@ const initialState = {
   error: null,
   currentPage: 1, // Текущая страница
   totalPages: 1, // Общее количество страниц
-  pageSize: 20, // Количество продуктов на странице
+  pageSize: 10, // Количество продуктов на странице
+  search: '',
 };
 
 const ordersSlice = createSlice({
@@ -35,9 +35,15 @@ const ordersSlice = createSlice({
     setPage: (state, action) => {
       state.currentPage = action.payload; // Изменяем текущую страницу
     },
+    setPageSize: (state, action) => {
+      state.pageSize = action.payload; // Изменяем размер страницы
+    },
     clearOrders: (state) => {
       state.orders = []; // Очищаем список
-    }
+    },
+    setSearch: (state, action) => {
+      state.search = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -45,8 +51,9 @@ const ordersSlice = createSlice({
         state.loading = true;
       })
       .addCase(fetchOrders.fulfilled, (state, action) => {
-        state.orders = action.payload; // Обновляем список
-        // state.totalPages = action.payload.totalPages; // Обновляем количество страниц
+        state.orders = action.payload.data; // Обновляем список
+        state.totalPages = action.payload.last_page; // Обновляем количество страниц
+        state.currentPage = action.payload.current_page;
         state.loading = false;
       })
       .addCase(fetchOrders.rejected, (state, action) => {
@@ -56,5 +63,5 @@ const ordersSlice = createSlice({
   },
 });
 
-export const {setPage, clearOrders} = ordersSlice.actions;
+export const {setPage, clearOrders, setPageSize, setSearch} = ordersSlice.actions;
 export default ordersSlice.reducer;
