@@ -28,7 +28,7 @@ function ContractorsList({loading}) {
           <></>) : (<Box
           sx={{
             display: 'grid',
-            gridTemplateColumns: '150px 1fr 2fr 100px 100px 100px',
+            gridTemplateColumns: '1fr 100px',
             bgcolor: 'primary.main',
             color: 'white',
             p: 1,
@@ -49,7 +49,7 @@ function ContractorsList({loading}) {
               display: 'grid',
               gridTemplateColumns: isSmallScreen
                 ? '1fr' // Один столбец на маленьком экране
-                : '150px 1fr 2fr 100px 100px 100px', // Стандартное оформление на большом экране
+                : '1fr 100px', // Стандартное оформление на большом экране
               textDecoration: 'none',
               color: 'inherit',
               p: 1,

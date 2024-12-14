@@ -94,7 +94,7 @@ function ContractorView() {
               УНП: {contractor.unp}
             </Typography>
             <Typography variant="body2" color="textSecondary">
-              Email: {contractor.email} ₽
+              Email: {contractor.email}
             </Typography>
             <Typography variant="body2" color="textSecondary">
               Адрес: {contractor.address}
