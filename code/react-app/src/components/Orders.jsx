@@ -50,7 +50,6 @@ function Orders() {
           color="primary"
           component={Link}
           to="/create-order"
-          sx={{mb: 2}}
         >
           Создать заказ
         </Button>

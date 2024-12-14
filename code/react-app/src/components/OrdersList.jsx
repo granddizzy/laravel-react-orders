@@ -37,10 +37,11 @@ function OrdersList({loading}) {
       {/* Список контрагентов */}
       <Box sx={{border: '1px solid #ccc', borderRadius: 1, overflow: 'hidden'}}>
         {/* Заголовок таблицы */}
-        <Box
+        {isSmallScreen ? (
+          <></>) : (<Box
           sx={{
             display: 'grid',
-            gridTemplateColumns: '100px 2fr 2fr 2fr 3fr ',
+            gridTemplateColumns: '100px 4fr 150px 100px 2fr',
             bgcolor: 'primary.main',
             color: 'white',
             p: 1,
@@ -51,7 +52,8 @@ function OrdersList({loading}) {
           {/*<Typography fontWeight="bold">Менеджер</Typography>*/}
           <Typography fontWeight="bold">Статус</Typography>
           <Typography fontWeight="bold">Сумма</Typography>
-        </Box>
+          <Typography fontWeight="bold">Примечание</Typography>
+        </Box>)}
 
         {/* Список товаров */}
         {orders.map((order, index) => (
@@ -61,7 +63,9 @@ function OrdersList({loading}) {
             to={`/orders/${order.id}`}
             sx={{
               display: 'grid',
-              gridTemplateColumns: '100px 2fr 2fr 2fr 3fr',
+              gridTemplateColumns: isSmallScreen
+                ? '1fr'
+                : '100px 4fr 150px 100px 2fr',
               textDecoration: 'none',
               color: 'inherit',
               p: 1,
@@ -74,12 +78,43 @@ function OrdersList({loading}) {
               transition: 'background-color 0.3s ease', // Плавный переход
             }}
           >
-            <Typography>{order.id}</Typography>
-            <Typography>{order.contractor.name}</Typography>
-            {/*<Typography>order.manager.name</Typography>*/}
-            <Typography>{getStatusInRussian(order.status)}</Typography>
-            <Typography>{order.total_amount}</Typography>
-            {/*<Typography>{order.shipping_address}</Typography>*/}
+            {isSmallScreen ? (
+              // Для маленьких экранов показываем значения в виде "ключ: значение"
+              <>
+                <Box sx={{display: 'flex', flexDirection: 'column'}}>
+                  <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+                    <Typography fontWeight="bold">Номер:</Typography>
+                    <Typography>{order.id}</Typography>
+                  </Box>
+                  <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+                    <Typography fontWeight="bold">Контрагент:</Typography>
+                    <Typography>{order.contractor.name}</Typography>
+                  </Box>
+                  <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+                    <Typography fontWeight="bold">Статус:</Typography>
+                    <Typography>{getStatusInRussian(order.status)}</Typography>
+                  </Box>
+                  <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+                    <Typography fontWeight="bold">Сумма:</Typography>
+                    <Typography>{order.total_amount}₽</Typography>
+                  </Box>
+                  <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+                    <Typography fontWeight="bold">Примечание:</Typography>
+                    <Typography>{order.notes}</Typography>
+                  </Box>
+                </Box>
+              </>
+            ) : (
+              // Для больших экранов показываем стандартную таблицу
+              <>
+                <Typography>{order.id}</Typography>
+                <Typography>{order.contractor.name}</Typography>
+                {/*<Typography>order.manager.name</Typography>*/}
+                <Typography>{getStatusInRussian(order.status)}</Typography>
+                <Typography>{order.total_amount}</Typography>
+                {/*<Typography>{order.shipping_address}</Typography>*/}
+              </>
+            )}
           </Box>
         ))}
       </Box>
