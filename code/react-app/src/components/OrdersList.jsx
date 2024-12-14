@@ -44,7 +44,7 @@ function OrdersList({loading}) {
           <Box
             key={order.id}
             component={Link}
-            to={`/order/${order.id}`}
+            to={`/orders/${order.id}`}
             sx={{
               display: 'grid',
               gridTemplateColumns: '100px 2fr 2fr 2fr 3fr',

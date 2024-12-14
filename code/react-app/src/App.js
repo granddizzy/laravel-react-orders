@@ -23,6 +23,8 @@ import ProductEdit from "./components/ProductEdit";
 import Product from "./components/Product";
 import Contractor from "./components/Contractor";
 import ContractorEdit from "./components/ContractorEdit";
+import OrderEdit from "./components/OrderEdit";
+import Order from "./components/Order";
 
 const baseUrl = "";
 // const baseUrl = "/orders-app";
@@ -51,7 +53,11 @@ function App() {
 
               {/* Страницы, которые доступны только авторизованным пользователям */}
               <Route path="/home" element={auth.token ? <Home/> : <Navigate to="/login"/>}/>
+
               <Route path="/orders" element={auth.token ? <Orders/> : <Navigate to="/login"/>}/>
+              <Route path="/create-order" element={auth.token ? <OrderCreate/> : <Navigate to="/login"/>}/>
+              <Route path="/orders/:orderId" element={auth.token ? <Order/> : <Navigate to="/login"/>}/>
+              <Route path="/edit-order/:ordersId" element={auth.token ? <OrderEdit/> : <Navigate to="/login"/>}/>
 
               <Route path="/catalog" element={auth.token ? <Products/> : <Navigate to="/login"/>}/>
               <Route path="/products/:productId" element={auth.token ? <Product/> : <Navigate to="/login"/>}/>
@@ -63,7 +69,7 @@ function App() {
               <Route path="/contractors/:contractorId" element={auth.token ? <Contractor/> : <Navigate to="/login"/>}/>
               <Route path="/edit-contractor/:contractorId" element={auth.token ? <ContractorEdit/> : <Navigate to="/login"/>}/>
 
-              <Route path="/create-order" element={auth.token ? <OrderCreate/> : <Navigate to="/login"/>}/>
+
 
               {/* Регистрация */}
               <Route path="/register" element={<Registration/>}/> {/* Обёрнутый компонент */}

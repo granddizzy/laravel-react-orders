@@ -88,15 +88,38 @@ function OrderCreate() {
   const handleAddItem = () => {
     setOrder((prev) => ({
       ...prev,
-      products: [...prev.products, {product_id: null, quantity: 1}],
+      products: [...prev.products, {product_id: null, quantity: 1, price: 0}],
     }));
   };
 
   // Обновление позиции заказа
   const handleItemChange = (index, field, value) => {
     const updatedItems = [...order.products];
-    updatedItems[index][field] = field === 'quantity' ? Number(value) : value;
-    setOrder((prev) => ({...prev, products: updatedItems}));
+
+    // Если изменяется количество (quantity)
+    if (field === 'quantity') {
+      const numericValue = parseFloat(value);
+      if (isNaN(numericValue) || numericValue <= 0) return; // Игнорируем, если значение не число или меньше 0
+      updatedItems[index][field] = numericValue;
+    }
+    // Если изменяется цена (price)
+    else if (field === 'price') {
+      const numericValue = parseFloat(value);  // Преобразуем в число с плавающей точкой
+      if (isNaN(numericValue) || numericValue <= 0) return; // Игнорируем, если значение не число или меньше 0
+      updatedItems[index][field] = numericValue;
+    }
+    // Если изменяется продукт (name)
+    else if (field === 'name') {
+      updatedItems[index]['product_id'] = value?.id || null;
+      updatedItems[index]['price'] = value ? value.price : 0;
+    } else {
+      updatedItems[index][field] = value; // Для других полей, присваиваем значение без изменений
+    }
+
+    setOrder((prev) => ({
+      ...prev,
+      products: updatedItems,
+    }));
   };
 
   // Удаление позиции из заказа
@@ -188,6 +211,7 @@ function OrderCreate() {
             <TableRow>
               <TableCell>Номенклатура</TableCell>
               <TableCell>Количество</TableCell>
+              <TableCell>Цена</TableCell>
               <TableCell>Действия</TableCell>
             </TableRow>
           </TableHead>
@@ -199,9 +223,10 @@ function OrderCreate() {
                     options={productOptions}
                     getOptionLabel={(option) => option.name}
                     onInputChange={handleProductSearch}
-                    onChange={(event, value) => {
-                      handleItemChange(index, 'product_id', value?.id || null);
+                    onChange={(e, value) => {
+                      handleItemChange(index, 'name', value)
                     }}
+                    value={productOptions.find((opt) => opt.id === item.product_id) || null}
                     loading={loadingProducts}
                     renderInput={(params) => (
                       <TextField
@@ -228,6 +253,16 @@ function OrderCreate() {
                     value={item.quantity}
                     onChange={(e) =>
                       handleItemChange(index, 'quantity', e.target.value)
+                    }
+                    required
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    type="number"
+                    value={item.price}
+                    onChange={(e) =>
+                      handleItemChange(index, 'price', e.target.value)
                     }
                     required
                   />

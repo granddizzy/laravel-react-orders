@@ -19,12 +19,12 @@ return new class extends Migration
 //            $table->foreignId('organization_id')->constrained()->onDelete('cascade');  // Организация, которая создала заказ
             $table->foreignId('contractor_id')->constrained()->onDelete('cascade');  // Контрагент, для которого создан заказ
             $table->enum('status', ['pending', 'confirmed', 'shipped', 'completed', 'cancelled'])->default('pending');  // Статус заказа
-//            $table->decimal('total_amount', 10, 2);  // Общая сумма заказа
             $table->string('shipping_address')->nullable();  // Адрес доставки
             $table->string('billing_address')->nullable();  // Адрес для счета (может отличаться от адреса доставки)
             $table->timestamp('ordered_at')->useCurrent();  // Дата и время размещения заказа
             $table->timestamp('shipped_at')->nullable();  // Дата отправки заказа
             $table->timestamp('completed_at')->nullable();  // Дата завершения заказа
+            $table->decimal('total_amount', 10, 2)->default(0);;  // Общая сумма
         });
     }
 

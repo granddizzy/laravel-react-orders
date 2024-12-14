@@ -13,6 +13,7 @@ class Order extends Model {
         'contractor_id',
         'shipping_address',
         'billing_address',
+        'total_amount',
     ];
 
     protected array $dates = ['ordered_at'];
@@ -42,7 +43,7 @@ class Order extends Model {
 
     public function products() {
         return $this->belongsToMany(Product::class)
-            ->withPivot('quantity')
+            ->withPivot('quantity', 'price')
             ->withTimestamps();
     }
 }

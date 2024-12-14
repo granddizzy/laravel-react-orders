@@ -110,22 +110,16 @@ class OrderController extends Controller {
             'contractor_id' => 'required|exists:contractors,id',  // Привязка к контрагенту
             'products' => 'required|array',  // Продукты, связанные с заказом
             'products.*.product_id' => 'required|exists:products,id',  // Каждый продукт должен существовать
-            'products.*.quantity' => 'required|integer|min:1',  // Количество каждого продукта
+            'products.*.quantity' => 'required|numeric|min:1',  // Количество каждого продукта
+            'products.*.price' => 'required|numeric|min:0',  // Цена каждого продукта
         ]);
 
         $products = $request->input('products', []);
 
-        // Создаем заказ
-        //        $order = Order::create($validated);
-        //
-        //        // Привязываем продукты к заказу (через pivot таблицу)
-        //        foreach ($request->products as $product) {
-        //            $order->products()->attach($product['product_id'], [
-        //                'quantity' => $product['quantity'],
-        ////                'price' => $product['price'],  // цена может быть передана в запросе
-        ////                'total' => $product['quantity'] * $product['price'],  // Общая сумма за продукт
-        //            ]);
-        //        }
+        $total_amount = 0;
+        foreach ($products as $product) {
+            $total_amount += $product['quantity'] * $product['price'];
+        }
 
         // Используем транзакцию
         DB::beginTransaction();
@@ -136,14 +130,14 @@ class OrderController extends Controller {
                 'shipping_address' => $validated['shipping_address'],
                 //            'billing_address' => $validated['billing_address'],
                 'contractor_id' => $validated['contractor_id'],
-                // Здесь могут быть другие поля, например, дата создания или статус
+                'total_amount' => $total_amount,
             ]);
 
             // Привязываем продукты к заказу
             foreach ($products as $product) {
                 $order->products()->attach($product['product_id'], [
                     'quantity' => $product['quantity'], // Указываем количество
-                    // Вы можете добавить дополнительные данные, такие как цена или скидка
+                    'price' => $product['price'], // Указываем цену
                 ]);
             }
             DB::commit(); // Фиксируем транзакцию

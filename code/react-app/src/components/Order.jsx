@@ -1,42 +1,34 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Typography,
-  Box,
-  Button,
-  Card,
-  CardContent,
-  CardMedia,
-} from '@mui/material';
+import { Typography, Box, Button, Card, CardContent } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useApi } from '../contexts/apiContext';
-import { useSelector } from "react-redux";
-import defaultImage from '../img/default-contractor-image.png'; // Импорт заглушки
+import { useSelector } from 'react-redux';
 
-function ContractorView() {
-  const { contractorId } = useParams(); // Получаем id продукта из URL
+function OrderView() {
+  const { orderId } = useParams(); // Получаем id заказа из URL
   const navigate = useNavigate();
   const apiUrl = useApi();
   const [isLoading, setIsLoading] = useState(false);
-  const [contractor, setContractor] = useState(null);
+  const [order, setOrder] = useState(null);
   const [error, setError] = useState(null);
 
   const token = useSelector((state) => state.auth.token);
 
-  // Функция для загрузки данных о продукте
+  // Функция для загрузки данных о заказе
   useEffect(() => {
-    const fetchContractor = async () => {
+    const fetchOrder = async () => {
       setIsLoading(true);
       try {
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
-        const response = await fetch(`${apiUrl}/contractors/${contractorId}`, {
+        const response = await fetch(`${apiUrl}/orders/${orderId}`, {
           method: 'GET', // Указываем метод запроса, по умолчанию 'GET'
           headers, // Заголовки, включая токен, если он есть
         });
         if (!response.ok) {
-          throw new Error('Контрагент не найден');
+          throw new Error('Заказ не найден');
         }
         const data = await response.json();
-        setContractor(data); // Заполняем данные продукта
+        setOrder(data); // Заполняем данные о заказе
       } catch (err) {
         setError(err.message);
       } finally {
@@ -44,13 +36,8 @@ function ContractorView() {
       }
     };
 
-    fetchContractor();
-  }, [apiUrl, contractorId]);
-
-  // Функция для перехода к странице редактирования продукта
-  const handleEdit = () => {
-    navigate(`/edit-contractor/${contractorId}`);
-  };
+    fetchOrder();
+  }, [apiUrl, orderId, token]);
 
   if (isLoading) {
     return <Typography>Загрузка...</Typography>;
@@ -72,62 +59,62 @@ function ContractorView() {
       }}
     >
       <Typography variant="h5" gutterBottom>
-        Просмотр контрагента
+        Просмотр заказа
       </Typography>
 
-      {contractor && (
+      {order && (
         <Card>
-          <CardMedia
-            component="img"
-            alt={contractor.name}
-            height="340"
-            image={contractor.image || defaultImage} // Используем заглушку, если изображения нет
-          />
           <CardContent>
             <Typography variant="h6" gutterBottom>
-              {contractor.name}
-            </Typography>
-            {/*<Typography variant="body1" paragraph>*/}
-            {/*  {contractor.description}*/}
-            {/*</Typography>*/}
-            <Typography variant="body2" color="textSecondary">
-              УНП: {contractor.unp}
+              Заказ № {order.id}
             </Typography>
             <Typography variant="body2" color="textSecondary">
-              Email: {contractor.email} ₽
+              Дата создания: {new Date(order.created_at).toLocaleDateString()}
             </Typography>
             <Typography variant="body2" color="textSecondary">
-              Адрес: {contractor.address}
+              Статус: {order.status}
             </Typography>
             <Typography variant="body2" color="textSecondary">
-              Телефон: {contractor.phone}
+              Менеджер: {order.manager_id}
             </Typography>
             <Typography variant="body2" color="textSecondary">
-              Контактное лицо: {contractor.contact_person}
+              Контрагент: {order.contractor_id}
             </Typography>
+            <Typography variant="body2" color="textSecondary">
+              Сумма: {order.total_amount} ₽
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
+              Примечания: {order.notes || 'Нет примечаний'}
+            </Typography>
+            {/* Пример дополнительных данных о заказе */}
+            {order.products && order.products.length > 0 && (
+              <Box mt={2}>
+                <Typography variant="body2" color="textSecondary" gutterBottom>
+                  Товары в заказе:
+                </Typography>
+                {order.products.map((item, index) => (
+                  <Typography key={index} variant="body2" color="textSecondary">
+                    {item.name} — {item.pivot.quantity} шт. ({item.pivot.price} ₽)
+                  </Typography>
+                ))}
+              </Box>
+            )}
           </CardContent>
         </Card>
       )}
 
-      {/* Кнопки "Назад" и "Редактировать" */}
-      <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
+      {/* Кнопка "Назад" */}
+      <Box sx={{ mt: 2 }}>
         <Button
           variant="outlined"
           color="secondary"
-          onClick={() => navigate("/clients")}
+          onClick={() => navigate("/orders")} // Переход к списку заказов
         >
           Назад
-        </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleEdit}
-        >
-          Редактировать
         </Button>
       </Box>
     </Box>
   );
 }
 
-export default ContractorView;
+export default OrderView;
