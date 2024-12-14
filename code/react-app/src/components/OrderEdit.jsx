@@ -23,6 +23,7 @@ function ContractorEdit() {
     address: '',
     phone: '',
     contact_person: '',
+    notes: '',
   });
   const [error, setError] = useState(null);
 
@@ -162,6 +163,13 @@ function ContractorEdit() {
         label="Контактное лицо"
         name="contact_person"
         value={formData.contact_person}
+        onChange={handleChange}
+        fullWidth
+      />
+      <TextField
+        label="Примечание"
+        name="notes"
+        value={formData.notes}
         onChange={handleChange}
         fullWidth
       />

@@ -14,6 +14,7 @@ class Order extends Model {
         'shipping_address',
         'billing_address',
         'total_amount',
+        'notes'
     ];
 
     protected array $dates = ['ordered_at'];

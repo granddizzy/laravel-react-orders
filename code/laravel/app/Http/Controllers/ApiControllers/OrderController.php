@@ -120,6 +120,7 @@ class OrderController extends Controller {
             'products.*.product_id' => 'required|exists:products,id',  // Каждый продукт должен существовать
             'products.*.quantity' => 'required|numeric|min:1',  // Количество каждого продукта
             'products.*.price' => 'required|numeric|min:0',  // Цена каждого продукта
+            'notes' => 'nullable|string',  // Поле для заметок
         ]);
 
         $products = $request->input('products', []);
@@ -139,6 +140,7 @@ class OrderController extends Controller {
                 //            'billing_address' => $validated['billing_address'],
                 'contractor_id' => $validated['contractor_id'],
                 'total_amount' => $total_amount,
+                'notes' => $validated['notes'],
             ]);
 
             // Привязываем продукты к заказу

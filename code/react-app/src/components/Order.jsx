@@ -98,6 +98,9 @@ function OrderView() {
               Сумма: {order.total_amount} ₽
             </Typography>
             <Typography variant="body2" color="textSecondary">
+              Адрес доставки: {order.shipping_address}
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
               Примечания: {order.notes || 'Нет примечаний'}
             </Typography>
             {/* Пример дополнительных данных о заказе */}

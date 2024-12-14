@@ -112,6 +112,7 @@ function OrdersList({loading}) {
                 {/*<Typography>order.manager.name</Typography>*/}
                 <Typography>{getStatusInRussian(order.status)}</Typography>
                 <Typography>{order.total_amount}</Typography>
+                <Typography>{order.notes}</Typography>
                 {/*<Typography>{order.shipping_address}</Typography>*/}
               </>
             )}

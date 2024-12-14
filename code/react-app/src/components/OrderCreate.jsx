@@ -33,6 +33,7 @@ function OrderCreate() {
     manager_id: 1,
     shipping_address: "",
     products: [],
+    notes: '',
   });
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -160,6 +161,15 @@ function OrderCreate() {
     }
   };
 
+  // Обновление текстового поля notes
+  const handleNotesChange = (event) => {
+    const {value} = event.target;
+    setOrder((prev) => ({
+      ...prev,
+      notes: value,
+    }));
+  };
+
   return (
     <Box
       component="form"
@@ -202,6 +212,16 @@ function OrderCreate() {
             }}
           />
         )}
+      />
+
+      {/* Поле ввода адреса доставки */}
+      <TextField
+        label="Адрес доставки"
+        fullWidth
+        value={order.shipping_address}
+        onChange={(event) =>
+          setOrder((prev) => ({...prev, shipping_address: event.target.value}))
+        }
       />
 
       {/* Таблица с позициями заказа */}
@@ -282,6 +302,16 @@ function OrderCreate() {
       <Button variant="outlined" onClick={handleAddItem}>
         Добавить позицию
       </Button>
+
+      {/* Поле ввода заметок (notes) */}
+      <TextField
+        label="Заметки"
+        multiline
+        rows={4}
+        fullWidth
+        value={order.notes}
+        onChange={handleNotesChange}
+      />
 
       {/* Ошибка */}
       {error && <Typography color="error">{error}</Typography>}
