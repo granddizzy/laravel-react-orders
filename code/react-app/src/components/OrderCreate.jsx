@@ -11,7 +11,7 @@ import {
   TableHead,
   TableRow,
   Paper,
-  IconButton,
+  IconButton, useTheme, useMediaQuery,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -38,6 +38,9 @@ function OrderCreate() {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const token = useSelector((state) => state.auth.token);
+
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('md')); // Проверка на маленький экран
 
   // Поиск контрагентов
   const fetchContractors = async (search = '') => {
@@ -225,78 +228,122 @@ function OrderCreate() {
       />
 
       {/* Таблица с позициями заказа */}
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Номенклатура</TableCell>
-              <TableCell>Количество</TableCell>
-              <TableCell>Цена</TableCell>
-              <TableCell>Действия</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {order.products.map((item, index) => (
-              <TableRow key={index}>
-                <TableCell>
-                  <Autocomplete
-                    options={productOptions}
-                    getOptionLabel={(option) => option.name}
-                    onInputChange={handleProductSearch}
-                    onChange={(e, value) => {
-                      handleItemChange(index, 'name', value)
-                    }}
-                    value={productOptions.find((opt) => opt.id === item.product_id) || null}
-                    loading={loadingProducts}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Номенклатура"
-                        InputProps={{
-                          ...params.InputProps,
-                          endAdornment: (
-                            <>
-                              {loadingProducts ? (
-                                <CircularProgress size={20}/>
-                              ) : null}
-                              {params.InputProps.endAdornment}
-                            </>
-                          ),
-                        }}
-                      />
-                    )}
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    type="number"
-                    value={item.quantity}
-                    onChange={(e) =>
-                      handleItemChange(index, 'quantity', e.target.value)
-                    }
-                    required
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    type="number"
-                    value={item.price}
-                    onChange={(e) =>
-                      handleItemChange(index, 'price', e.target.value)
-                    }
-                    required
-                  />
-                </TableCell>
-                <TableCell>
-                  <IconButton onClick={() => handleRemoveItem(index)}>
-                    <DeleteIcon/>
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      {isSmallScreen ? (
+        // Адаптивная версия для маленьких экранов
+        <Box>
+          {order.products.map((item, index) => (
+            <Paper key={index} sx={{mb: 2, p: 2}}>
+              <Box sx={{display: 'flex', gap: 2, mb: 2}}>
+                <Autocomplete
+                  options={productOptions}
+                  getOptionLabel={(option) => option.name}
+                  onInputChange={handleProductSearch}
+                  onChange={(e, value) => handleItemChange(index, 'name', value)}
+                  value={productOptions.find((opt) => opt.id === item.product_id) || null}
+                  loading={loadingProducts}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Номенклатура"
+                      InputProps={{
+                        ...params.InputProps,
+                        endAdornment: (
+                          <>
+                            {loadingProducts ? <CircularProgress size={20}/> : null}
+                            {params.InputProps.endAdornment}
+                          </>
+                        ),
+                      }}
+                    />
+                  )}
+                  fullWidth
+                />
+              </Box>
+              <Box sx={{display: 'flex', gap: 2, alignItems: 'center'}}>
+                <TextField
+                  type="number"
+                  label="Количество"
+                  value={item.quantity}
+                  onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
+                  required
+                  sx={{flex: 1}}
+                />
+                <TextField
+                  type="number"
+                  label="Цена"
+                  value={item.price}
+                  onChange={(e) => handleItemChange(index, 'price', e.target.value)}
+                  required
+                  sx={{flex: 1}}
+                />
+                <IconButton onClick={() => handleRemoveItem(index)}>
+                  <DeleteIcon/>
+                </IconButton>
+              </Box>
+            </Paper>
+          ))}
+        </Box>
+      ) : (
+        // Обычная версия для больших экранов
+        <TableContainer component={Paper}>
+          <Table>
+            <TableBody>
+              {order.products.map((item, index) => (
+                <TableRow key={index}>
+                  <TableCell sx={{width: '50%'}}>
+                    <Autocomplete
+                      options={productOptions}
+                      getOptionLabel={(option) => option.name}
+                      onInputChange={handleProductSearch}
+                      onChange={(e, value) => handleItemChange(index, 'name', value)}
+                      value={productOptions.find((opt) => opt.id === item.product_id) || null}
+                      loading={loadingProducts}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Номенклатура"
+                          InputProps={{
+                            ...params.InputProps,
+                            endAdornment: (
+                              <>
+                                {loadingProducts ? <CircularProgress size={20}/> : null}
+                                {params.InputProps.endAdornment}
+                              </>
+                            ),
+                          }}
+                        />
+                      )}
+                    />
+                  </TableCell>
+                  <TableCell sx={{width: '15%'}}>
+                    <TextField
+                      type="number"
+                      label="Количество"
+                      value={item.quantity}
+                      onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
+                      required
+                    />
+                  </TableCell>
+                  <TableCell sx={{width: '15%'}}>
+                    <TextField
+                      type="number"
+                      label="Цена"
+                      value={item.price}
+                      onChange={(e) => handleItemChange(index, 'price', e.target.value)}
+                      required
+                    />
+                  </TableCell>
+                  <TableCell sx={{width: '10%'}}>
+                    <IconButton onClick={() => handleRemoveItem(index)}>
+                      <DeleteIcon/>
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
 
       {/* Кнопка для добавления новой строки */}
       <Button variant="outlined" onClick={handleAddItem}>
@@ -316,15 +363,25 @@ function OrderCreate() {
       {/* Ошибка */}
       {error && <Typography color="error">{error}</Typography>}
 
-      {/* Кнопка отправки */}
-      <Button
-        type="submit"
-        variant="contained"
-        color="primary"
-        disabled={isLoading || !order.contractor_id || order.products.length === 0}
-      >
-        {isLoading ? 'Создание...' : 'Создать заказ'}
-      </Button>
+      <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={() => navigate('/orders')}
+          sx={{ flexShrink: 0 }} // Кнопка "Отмена" фиксированного размера
+        >
+          Отмена
+        </Button>
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          disabled={isLoading || !order.contractor_id || order.products.length === 0}
+          sx={{ flexGrow: 1 }} // Кнопка "Создать заказ" занимает оставшуюся ширину
+        >
+          {isLoading ? 'Создание...' : 'Создать заказ'}
+        </Button>
+      </Box>
     </Box>
   );
 }
