@@ -3,7 +3,7 @@ import React from 'react';
 import {
   Typography,
   Box,
-  Button, useTheme, useMediaQuery
+  Button, useTheme, useMediaQuery, CircularProgress
 } from '@mui/material';
 import {useSelector} from "react-redux";
 
@@ -16,7 +16,7 @@ function ContractorsList({loading}) {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('md')); // Проверка на маленький экран
 
-  if (loading) return <div>Загрузка...</div>;
+  if (loading) return <CircularProgress />;
 
   return (
     <>
