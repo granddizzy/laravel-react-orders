@@ -9,7 +9,7 @@ class Order extends Model {
     use HasFactory;
 
     protected $fillable = [
-        'manager_id',
+        'user_id',
         'contractor_id',
         'shipping_address',
         'billing_address',
@@ -32,10 +32,6 @@ class Order extends Model {
 
     public function user() {
         return $this->belongsTo(User::class);
-    }
-
-    public function manager() {
-        return $this->belongsTo(Manager::class);
     }
 
     public function contractor() {

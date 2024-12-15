@@ -86,10 +86,10 @@ function OrderView() {
               Дата создания: {new Date(order.created_at).toLocaleDateString()}
             </Typography>
             <Typography variant="body2" color="textSecondary">
-              Статус: {getStatusInRussian(order.status)}
+              Автор: {order.user.name}
             </Typography>
             <Typography variant="body2" color="textSecondary">
-              Менеджер: {''}
+              Статус: {getStatusInRussian(order.status)}
             </Typography>
             <Typography variant="body2" color="textSecondary">
               Контрагент: {order.contractor.name}

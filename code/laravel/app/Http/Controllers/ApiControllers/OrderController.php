@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller {
     /**
@@ -105,15 +106,8 @@ class OrderController extends Controller {
     public function store(Request $request) {
         // Валидируем данные запроса
         $validated = $request->validate([
-            //            'user_id' => 'required|exists:users,id',
-            'manager_id' => 'required|exists:managers,id',
-            //            'status' => 'required|in:pending,confirmed,shipped,completed,cancelled',
-            //            'total_amount' => 'required|numeric',
             'shipping_address' => 'nullable|string',
             //            'billing_address' => 'nullable|string',
-            //            'ordered_at' => 'nullable|date',
-            //            'shipped_at' => 'nullable|date',
-            //            'completed_at' => 'nullable|date',
             //            'organization_id' => 'required|exists:organizations,id',  // Привязка к организации
             'contractor_id' => 'required|exists:contractors,id',  // Привязка к контрагенту
             'products' => 'required|array',  // Продукты, связанные с заказом
@@ -123,6 +117,7 @@ class OrderController extends Controller {
             'notes' => 'nullable|string',  // Поле для заметок
         ]);
 
+        $userId = auth()->id();
         $products = $request->input('products', []);
 
         $total_amount = 0;
@@ -135,7 +130,7 @@ class OrderController extends Controller {
 
         try {
             $order = Order::create([
-                'manager_id' => $validated['manager_id'],
+                'user_id' => $userId,
                 'shipping_address' => $validated['shipping_address'],
                 //            'billing_address' => $validated['billing_address'],
                 'contractor_id' => $validated['contractor_id'],
@@ -154,6 +149,7 @@ class OrderController extends Controller {
             return response()->json($order, 201);
         } catch (\Exception $e) {
             DB::rollBack(); // Откатываем транзакцию в случае ошибки
+            Log::error('Error creating order', ['error' => $e->getMessage()]);
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
@@ -163,14 +159,26 @@ class OrderController extends Controller {
      */
     public function show(string $id) {
         // Получаем заказ по ID
-        $order = Order::with('contractor', 'products')->find($id);
+        try {
+            $order = Order::with('contractor', 'products', 'user')->findOrFail($id);
+        } catch (\Exception $e) {
+            Log::error('Error fetching order:', ['error' => $e->getMessage()]);
+            return response()->json(['message' => 'Order not found'], 404);
+        }
 
         // Если заказ не найден, возвращаем ошибку
         if (!$order) {
             return response()->json(['message' => 'Order not found'], 404);
         }
 
-        return response()->json($order);
+        $orderArray = $order->toArray();
+        try {
+            Log::info('Order data: ', ['order' => $order->toArray()]);
+            return response()->json($orderArray);
+        } catch (\Exception $e) {
+            Log::error('Error fetching order:', ['error' => $e->getMessage()]);
+            return response()->json(['message' => 'Order not found'], 404);
+        }
     }
 
     /**

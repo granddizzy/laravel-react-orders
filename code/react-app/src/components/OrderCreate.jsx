@@ -30,7 +30,6 @@ function OrderCreate() {
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [order, setOrder] = useState({
     contractor_id: null,
-    manager_id: 1,
     shipping_address: "",
     products: [],
     notes: '',
