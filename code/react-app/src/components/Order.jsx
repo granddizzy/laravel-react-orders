@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Typography, Box, Button, Card, CardContent} from '@mui/material';
+import {Typography, Box, Button, Card, CardContent, CircularProgress} from '@mui/material';
 import {useNavigate, useParams} from 'react-router-dom';
 import {useApi} from '../contexts/apiContext';
 import {useSelector} from 'react-redux';
@@ -54,7 +54,7 @@ function OrderView() {
   }, [apiUrl, orderId, token]);
 
   if (isLoading) {
-    return <Typography>Загрузка...</Typography>;
+    return <CircularProgress />;
   }
 
   if (error) {
@@ -120,14 +120,21 @@ function OrderView() {
         </Card>
       )}
 
-      {/* Кнопка "Назад" */}
-      <Box sx={{mt: 2}}>
+      {/* Кнопки "Назад" и "Редактировать" */}
+      <Box sx={{mt: 2, display: 'flex', gap: 2}}>
         <Button
           variant="outlined"
           color="secondary"
           onClick={() => navigate("/orders")} // Переход к списку заказов
         >
           Назад
+        </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => navigate(`/orders/${orderId}/edit`)} // Переход к странице редактирования заказа
+        >
+          Редактировать
         </Button>
       </Box>
     </Box>

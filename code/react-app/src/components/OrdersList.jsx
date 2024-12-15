@@ -3,7 +3,7 @@ import React from 'react';
 import {
   Typography,
   Box,
-  Button, useTheme, useMediaQuery
+  Button, useTheme, useMediaQuery, CircularProgress
 } from '@mui/material';
 import {useSelector} from "react-redux";
 
@@ -30,7 +30,7 @@ function OrdersList({loading}) {
     return statusMap[status] || status; // Если статус не найден, выводим исходный
   };
 
-  if (loading) return <div>Загрузка...</div>;
+  if (loading) return <CircularProgress />;
 
   return (
     <>

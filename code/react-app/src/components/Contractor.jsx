@@ -5,7 +5,7 @@ import {
   Button,
   Card,
   CardContent,
-  CardMedia,
+  CardMedia, CircularProgress,
 } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useApi } from '../contexts/apiContext';
@@ -53,7 +53,7 @@ function ContractorView() {
   };
 
   if (isLoading) {
-    return <Typography>Загрузка...</Typography>;
+    return <CircularProgress />;
   }
 
   if (error) {
