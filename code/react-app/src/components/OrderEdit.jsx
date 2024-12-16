@@ -20,6 +20,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import {useApi} from '../contexts/apiContext';
 import {useNavigate, useParams} from "react-router-dom";
 import {useSelector} from "react-redux";
+import debounce from "lodash.debounce";
 
 function OrderEdit() {
   const apiUrl = useApi();
@@ -29,14 +30,15 @@ function OrderEdit() {
   const [contractorOptions, setContractorOptions] = useState([]);
   const [productOptions, setProductOptions] = useState([]);
   const [loadingContractors, setLoadingContractors] = useState(false);
-  const [loadingProducts, setLoadingProducts] = useState(false);
+  const [loadingProducts, setLoadingProducts] = useState([]);
   const [error, setError] = useState(null);
   const [submitError, setSubmitError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmit, setIsSubmit] = useState(false);
   const [order, setOrder] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setformData] = useState({
     contractor_id: null,
+    contractor_name: null,
     shipping_address: '',
     products: [],
     notes: '',
@@ -61,23 +63,25 @@ function OrderEdit() {
           throw new Error('Заказ не найден');
         }
         const data = await response.json();
-        setOrder(data);
+        //setOrder(data);
 
         // Заполнение formData
-        setFormData({
+        setformData({
+          id: data.id,
+          contractor: data.contractor,
           contractor_id: data.contractor_id,
+          contractor_name: data.contractor.name,
           shipping_address: data.shipping_address,
           products: data.products.map(product => ({
+            product: product,
             product_id: product.pivot.product_id,
+            product_name: product.name,
             quantity: parseFloat(product.pivot.quantity),
             price: parseFloat(product.pivot.price),
           })),
           notes: data.notes || '',
         });
-
-        // Подстановка контрагента и продуктов в options
-        setContractorOptions([data.contractor]);
-        setProductOptions(data.products);
+        console.log("Срабоала загрузка");
       } catch (err) {
         setError(err.message);
       } finally {
@@ -87,6 +91,19 @@ function OrderEdit() {
     fetchOrder();
   }, [orderId, apiUrl, token]);
 
+  // Динамическая загрузка контрагентов
+  const handleContractorSearch = (event, value) => {
+    debouncedFetchContractors(value);
+  };
+
+  // Динамическая загрузка продуктов
+  const handleProductSearch = (index, event, value) => {
+    debouncedFetchProducts(index, value);
+  };
+
+  const debouncedFetchContractors = React.useCallback(
+    debounce((value) => fetchContractors(value), 1000)
+  );
   // Поиск контрагентов
   const fetchContractors = async (search = '') => {
     setLoadingContractors(true);
@@ -102,24 +119,44 @@ function OrderEdit() {
     }
   };
 
+  const debouncedFetchProducts = React.useCallback(
+    debounce((index, value) => fetchProducts(index, value), 1000)
+  );
   // Поиск номенклатуры
-  const fetchProducts = async (search = '') => {
-    setLoadingProducts(true);
+  const fetchProducts = async (index, search = '') => {
+    setLoadingProducts((prev) => {
+      const updatedLoading = [...prev];
+      updatedLoading[index] = true; // Установить загрузку для конкретного индекса
+      return updatedLoading;
+    });
     try {
       const headers = token ? {Authorization: `Bearer ${token}`} : {};
       const response = await fetch(`${apiUrl}/products?search=${search}`, {headers});
       const result = await response.json();
-      setProductOptions(result.data);
+      console.log(result)
+      setProductOptions((prev) => {
+        const updatedOptions = [...prev];
+        updatedOptions[index] = result.data; // Обновить продукты для конкретного индекса
+        return updatedOptions;
+      });
     } catch {
-      setProductOptions([]);
+      setProductOptions((prev) => {
+        const updatedOptions = [...prev];
+        updatedOptions[index] = []; // Обновить продукты для конкретного индекса
+        return updatedOptions;
+      });
     } finally {
-      setLoadingProducts(false);
+      setLoadingProducts((prev) => {
+        const updatedLoading = [...prev];
+        updatedLoading[index] = false; // Установить загрузку для конкретного индекса
+        return updatedLoading;
+      });
     }
   };
 
   // Добавление позиции в заказ
   const handleAddItem = () => {
-    setFormData((prev) => ({
+    setformData((prev) => ({
       ...prev,
       products: [...prev.products, {product_id: null, quantity: 1, price: 0}],
     }));
@@ -133,15 +170,16 @@ function OrderEdit() {
       if (isNaN(numericValue) || numericValue <= 0) return;
       updatedItems[index][field] = numericValue;
     } else if (field === 'name') {
+      updatedItems[index][field] = value;
       updatedItems[index]['product_id'] = value?.id || null;
-      updatedItems[index]['price'] = value ? value.price : 0;
+      updatedItems[index]['price'] = parseFloat(value.price);
     }
-    setFormData((prev) => ({...prev, products: updatedItems}));
+    setformData((prev) => ({...prev, products: updatedItems}));
   };
 
   const handleRemoveItem = (index) => {
     const updatedItems = formData.products.filter((_, i) => i !== index);
-    setFormData((prev) => ({...prev, products: updatedItems}));
+    setformData((prev) => ({...prev, products: updatedItems}));
   };
 
   // Отправка данных
@@ -179,7 +217,7 @@ function OrderEdit() {
   // Обновление текстового поля notes
   const handleNotesChange = (event) => {
     const {value} = event.target;
-    setFormData((prev) => ({
+    setformData((prev) => ({
       ...prev,
       notes: value,
     }));
@@ -195,16 +233,16 @@ function OrderEdit() {
       sx={{display: 'flex', flexDirection: 'column', gap: 3, maxWidth: 800, mx: 'auto', mt: 4}}>
 
       <Typography variant="h5" gutterBottom>
-        Редактировать заказ № {order?.id || ''}
+        Редактировать заказ № {formData?.id || ''}
       </Typography>
 
       <Autocomplete
         options={contractorOptions}
         getOptionLabel={(option) => option.name}
-        onInputChange={(event, value) => fetchContractors(value)}
-        onChange={(event, value) => setFormData((prev) => ({...prev, contractor_id: value?.id || null}))}
+        onInputChange={handleContractorSearch}
+        onChange={(event, value) => setformData((prev) => ({...prev, contractor_id: value?.id || null}))}
         loading={loadingContractors}
-        value={contractorOptions.find((opt) => opt.id === formData.contractor_id) || null}
+        value={formData.contractor}
         renderInput={(params) => (
           <TextField
             {...params}
@@ -227,67 +265,120 @@ function OrderEdit() {
         label="Адрес доставки"
         fullWidth
         value={formData.shipping_address}
-        onChange={(event) => setFormData((prev) => ({...prev, shipping_address: event.target.value}))}
+        onChange={(event) => setformData((prev) => ({...prev, shipping_address: event.target.value}))}
       />
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableBody>
-            {formData.products.map((item, index) => (
-              <TableRow key={index}>
-                <TableCell sx={{width: '50%'}}>
-                  <Autocomplete
-                    options={productOptions}
-                    getOptionLabel={(option) => option.name}
-                    onInputChange={(event, value) => fetchProducts(value)}
-                    onChange={(e, value) => handleItemChange(index, 'name', value)}
-                    value={productOptions.find((opt) => opt.id === item.product_id) || null}
-                    loading={loadingProducts}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Номенклатура"
-                        InputProps={{
-                          ...params.InputProps,
-                          endAdornment: (
-                            <>
-                              {loadingProducts ? <CircularProgress size={20}/> : null}
-                              {params.InputProps.endAdornment}
-                            </>
-                          ),
-                        }}
-                      />
-                    )}
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    type="number"
-                    label="Количество"
-                    value={item.quantity}
-                    onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
-                    required
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    type="number"
-                    label="Цена"
-                    value={item.price}
-                    onChange={(e) => handleItemChange(index, 'price', e.target.value)}
-                    required
-                  />
-                </TableCell>
-                <TableCell>
-                  <IconButton onClick={() => handleRemoveItem(index)}>
-                    <DeleteIcon/>
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      {isSmallScreen ? (<Box>
+          {formData.products.map((item, index) => (
+            <Paper key={index} sx={{mb: 2, p: 2}}>
+              <Box sx={{display: 'flex', gap: 2, mb: 2}}>
+                <Autocomplete
+                  options={productOptions[index] || []}
+                  getOptionLabel={(option) => option.name}
+                  onInputChange={(e, value) => handleProductSearch(index, e, value)}
+                  onChange={(e, value) => handleItemChange(index, 'name', value)}
+                  value={item.product}
+                  loading={loadingProducts[index] || false}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Номенклатура *"
+                      InputProps={{
+                        ...params.InputProps,
+                        endAdornment: (
+                          <>
+                            {loadingProducts[index] ? <CircularProgress size={20}/> : null}
+                            {params.InputProps.endAdornment}
+                          </>
+                        ),
+                      }}
+                    />
+                  )}
+                  fullWidth
+                />
+              </Box>
+              <Box sx={{display: 'flex', gap: 2, alignItems: 'center'}}>
+                <TextField
+                  type="number"
+                  label="Количество"
+                  value={item.quantity}
+                  onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
+                  required
+                  sx={{flex: 1}}
+                />
+                <TextField
+                  type="number"
+                  label="Цена"
+                  value={item.price}
+                  onChange={(e) => handleItemChange(index, 'price', e.target.value)}
+                  required
+                  sx={{flex: 1}}
+                />
+                <IconButton onClick={() => handleRemoveItem(index)}>
+                  <DeleteIcon/>
+                </IconButton>
+              </Box>
+            </Paper>
+          ))}
+        </Box>) :
+        (<TableContainer component={Paper}>
+          <Table>
+            <TableBody>
+              {formData.products.map((item, index) => (
+                <TableRow key={index}>
+                  <TableCell sx={{width: '50%'}}>
+                    <Autocomplete
+                      options={productOptions}
+                      getOptionLabel={(option) => option.name}
+                      onInputChange={(e, value) => handleProductSearch(index, e, value)}
+                      onChange={(e, value) => handleItemChange(index, 'name', value)}
+                      value={item.product}
+                      loading={loadingProducts[index] || false}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Номенклатура"
+                          InputProps={{
+                            ...params.InputProps,
+                            endAdornment: (
+                              <>
+                                {loadingProducts[index] ? <CircularProgress size={20}/> : null}
+                                {params.InputProps.endAdornment}
+                              </>
+                            ),
+                          }}
+                        />
+                      )}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <TextField
+                      type="number"
+                      label="Количество"
+                      value={item.quantity}
+                      onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
+                      required
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <TextField
+                      type="number"
+                      label="Цена"
+                      value={item.price}
+                      onChange={(e) => handleItemChange(index, 'price', e.target.value)}
+                      required
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <IconButton onClick={() => handleRemoveItem(index)}>
+                      <DeleteIcon/>
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>)}
 
       {/* Кнопка для добавления новой строки */}
       <Button variant="outlined" onClick={handleAddItem}>
