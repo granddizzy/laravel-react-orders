@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {
   Typography,
   Box,
@@ -8,47 +8,52 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableHead,
   TableRow,
   Paper,
-  IconButton, useTheme, useMediaQuery,
+  IconButton,
+  CircularProgress, useMediaQuery, useTheme,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Autocomplete from '@mui/material/Autocomplete';
-import CircularProgress from '@mui/material/CircularProgress';
 import {useApi} from '../contexts/apiContext';
 import {useNavigate} from "react-router-dom";
 import {useSelector} from "react-redux";
+import debounce from "lodash.debounce";
+import {setSearch} from "../redux/ordersSlice";
 
 function OrderCreate() {
   const apiUrl = useApi();
   const navigate = useNavigate();
+  const token = useSelector((state) => state.auth.token);
+
   // Локальное состояние
   const [contractorOptions, setContractorOptions] = useState([]);
   const [productOptions, setProductOptions] = useState([]);
   const [loadingContractors, setLoadingContractors] = useState(false);
-  const [loadingProducts, setLoadingProducts] = useState(false);
+  const [loadingProducts, setLoadingProducts] = useState([]);
   const [order, setOrder] = useState({
     contractor_id: null,
-    shipping_address: "",
-    products: [],
+    shipping_address: '',
+    products: [], // Массив с товарами в заказе
     notes: '',
   });
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const token = useSelector((state) => state.auth.token);
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('md')); // Проверка на маленький экран
 
+  const debouncedFetchContractors = React.useCallback(
+    debounce((value) => fetchContractors(value), 1000)
+  );
   // Поиск контрагентов
   const fetchContractors = async (search = '') => {
     setLoadingContractors(true);
     try {
       const headers = token ? {Authorization: `Bearer ${token}`} : {};
       const response = await fetch(`${apiUrl}/contractors?search=${search}`, {
-        method: 'GET',  // Указываем метод запроса, по умолчанию 'GET'
-        headers, // Заголовки, включая токен, если он есть
+        method: 'GET',
+        headers,
       });
       const result = await response.json();
       setContractorOptions(result.data);
@@ -59,39 +64,60 @@ function OrderCreate() {
     }
   };
 
-  // Поиск номенклатуры
-  const fetchProducts = async (search = '') => {
-    setLoadingProducts(true);
+  const debouncedFetchProducts = React.useCallback(
+    debounce((index, value) => fetchProducts(index, value), 100)
+  );
+
+  // Поиск номенклатуры для всех позиций в заказе
+  const fetchProducts = async (index, search = '') => {
+    setLoadingProducts((prev) => {
+      const updatedLoading = [...prev];
+      updatedLoading[index] = true; // Установить загрузку для конкретного индекса
+      return updatedLoading;
+    });
+
     try {
       const headers = token ? {Authorization: `Bearer ${token}`} : {};
       const response = await fetch(`${apiUrl}/products?search=${search}`, {
-        method: 'GET',  // Указываем метод запроса, по умолчанию 'GET'
-        headers, // Заголовки, включая токен, если он есть
+        method: 'GET',
+        headers,
       });
       const result = await response.json();
-      setProductOptions(result.data);
+      setProductOptions((prev) => {
+        const updatedOptions = [...prev];
+        updatedOptions[index] = result.data; // Обновить продукты для конкретного индекса
+        return updatedOptions;
+      });
     } catch {
-      setProductOptions([]);
+      setProductOptions((prev) => {
+        const updatedOptions = [...prev];
+        updatedOptions[index] = []; // Обновить продукты для конкретного индекса
+        return updatedOptions;
+      });
     } finally {
-      setLoadingProducts(false);
+      setLoadingProducts((prev) => {
+        const updatedLoading = [...prev];
+        updatedLoading[index] = false; // Установить загрузку для конкретного индекса
+        return updatedLoading;
+      });
     }
   };
 
   // Динамическая загрузка контрагентов
   const handleContractorSearch = (event, value) => {
-    fetchContractors(value);
+    debouncedFetchContractors(value);
   };
 
-  // Динамическая загрузка номенклатуры
-  const handleProductSearch = (event, value) => {
-    fetchProducts(value);
+  // Динамическая загрузка продуктов
+  const handleProductSearch = (index, event, value) => {
+    debouncedFetchProducts(index, value);
   };
 
   // Добавление позиции в заказ
   const handleAddItem = () => {
     setOrder((prev) => ({
       ...prev,
-      products: [...prev.products, {product_id: null, quantity: 1, price: 0}],
+      products: [...prev.products, {product_id: null, name: '', quantity: 1, price: 0}],
     }));
   };
 
@@ -99,24 +125,17 @@ function OrderCreate() {
   const handleItemChange = (index, field, value) => {
     const updatedItems = [...order.products];
 
-    // Если изменяется количество (quantity)
-    if (field === 'quantity') {
+    if (field === 'quantity' || field === 'price') {
       const numericValue = parseFloat(value);
-      if (isNaN(numericValue) || numericValue <= 0) return; // Игнорируем, если значение не число или меньше 0
+      if (isNaN(numericValue) || numericValue <= 0) return;
       updatedItems[index][field] = numericValue;
     }
-    // Если изменяется цена (price)
-    else if (field === 'price') {
-      const numericValue = parseFloat(value);  // Преобразуем в число с плавающей точкой
-      if (isNaN(numericValue) || numericValue <= 0) return; // Игнорируем, если значение не число или меньше 0
-      updatedItems[index][field] = numericValue;
-    }
-    // Если изменяется продукт (name)
-    else if (field === 'name') {
-      updatedItems[index]['product_id'] = value?.id || null;
-      updatedItems[index]['price'] = value ? value.price : 0;
+    if (field === 'name') {
+      updatedItems[index][field] = value;
+      updatedItems[index]['product_id'] = value.id;
+      updatedItems[index]['price'] = parseFloat(value.price);
     } else {
-      updatedItems[index][field] = value; // Для других полей, присваиваем значение без изменений
+      updatedItems[index][field] = value;
     }
 
     setOrder((prev) => ({
@@ -134,9 +153,19 @@ function OrderCreate() {
   // Отправка формы
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    if (!order.contractor_id || order.products.length === 0) {
+      setError('Пожалуйста, заполните все обязательные поля.');
+      return;
+    }
+
+    if (order.products.some((item) => !item.product_id || item.quantity <= 0 || item.price <= 0)) {
+      setError('Проверьте позиции: все товары должны быть выбраны, а количество и цена указаны корректно.');
+      return;
+    }
+
     setIsLoading(true);
     try {
-      console.log(order)
       const headers = {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -147,8 +176,6 @@ function OrderCreate() {
         headers,
         body: JSON.stringify(order),
       });
-
-      console.log(response);
 
       if (!response.ok) {
         throw new Error('Ошибка при создании заказа.');
@@ -201,8 +228,10 @@ function OrderCreate() {
         renderInput={(params) => (
           <TextField
             {...params}
-            label="Контрагент"
+            label="Контрагент *"
             fullWidth
+            error={!order.contractor_id && error} // Подсветка ошибки
+            helperText={!order.contractor_id && error ? 'Выберите контрагента' : ''}
             InputProps={{
               ...params.InputProps,
               endAdornment: (
@@ -213,7 +242,8 @@ function OrderCreate() {
               ),
             }}
           />
-        )}
+        )
+        }
       />
 
       {/* Поле ввода адреса доставки */}
@@ -234,21 +264,21 @@ function OrderCreate() {
             <Paper key={index} sx={{mb: 2, p: 2}}>
               <Box sx={{display: 'flex', gap: 2, mb: 2}}>
                 <Autocomplete
-                  options={productOptions}
+                  options={productOptions[index] || []}
                   getOptionLabel={(option) => option.name}
-                  onInputChange={handleProductSearch}
+                  onInputChange={(e, value) => handleProductSearch(index, e, value)}
                   onChange={(e, value) => handleItemChange(index, 'name', value)}
-                  value={productOptions.find((opt) => opt.id === item.product_id) || null}
-                  loading={loadingProducts}
+                  value={item.name || null}
+                  loading={loadingProducts[index] || false}
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label="Номенклатура"
+                      label="Номенклатура *"
                       InputProps={{
                         ...params.InputProps,
                         endAdornment: (
                           <>
-                            {loadingProducts ? <CircularProgress size={20}/> : null}
+                            {loadingProducts[index] ? <CircularProgress size={20}/> : null}
                             {params.InputProps.endAdornment}
                           </>
                         ),
@@ -291,12 +321,12 @@ function OrderCreate() {
                 <TableRow key={index}>
                   <TableCell sx={{width: '50%'}}>
                     <Autocomplete
-                      options={productOptions}
+                      options={productOptions[index] || []}
                       getOptionLabel={(option) => option.name}
-                      onInputChange={handleProductSearch}
+                      onInputChange={(e, value) => handleProductSearch(index, e, value)}
                       onChange={(e, value) => handleItemChange(index, 'name', value)}
-                      value={productOptions.find((opt) => opt.id === item.product_id) || null}
-                      loading={loadingProducts}
+                      value={item.name || null}
+                      loading={loadingProducts[index] || false}
                       renderInput={(params) => (
                         <TextField
                           {...params}
@@ -305,7 +335,7 @@ function OrderCreate() {
                             ...params.InputProps,
                             endAdornment: (
                               <>
-                                {loadingProducts ? <CircularProgress size={20}/> : null}
+                                {loadingProducts[index] ? <CircularProgress size={20}/> : null}
                                 {params.InputProps.endAdornment}
                               </>
                             ),
@@ -344,43 +374,29 @@ function OrderCreate() {
         </TableContainer>
       )}
 
-      {/* Кнопка для добавления новой строки */}
-      <Button variant="outlined" onClick={handleAddItem}>
+      {/* Кнопка добавления позиции */}
+      <Button onClick={handleAddItem} variant="contained">
         Добавить позицию
       </Button>
 
-      {/* Поле ввода заметок (notes) */}
+      {/* Поле ввода примечаний */}
       <TextField
-        label="Заметки"
+        label="Примечания"
         multiline
         rows={4}
-        fullWidth
         value={order.notes}
         onChange={handleNotesChange}
       />
 
-      {/* Ошибка */}
+      {/* Сообщения об ошибке или загрузке */}
       {error && <Typography color="error">{error}</Typography>}
-
-      <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
-        <Button
-          variant="outlined"
-          color="secondary"
-          onClick={() => navigate('/orders')}
-          sx={{ flexShrink: 0 }} // Кнопка "Отмена" фиксированного размера
-        >
-          Отмена
-        </Button>
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          disabled={isLoading || !order.contractor_id || order.products.length === 0}
-          sx={{ flexGrow: 1 }} // Кнопка "Создать заказ" занимает оставшуюся ширину
-        >
-          {isLoading ? 'Создание...' : 'Создать заказ'}
-        </Button>
-      </Box>
+      <Button
+        type="submit"
+        variant="contained"
+        disabled={isLoading} // Заблокировать кнопку при загрузке
+      >
+        {isLoading ? 'Сохранение' : 'Сохранить заказ'}
+      </Button>
     </Box>
   );
 }
