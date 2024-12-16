@@ -57,7 +57,7 @@ function App() {
               <Route path="/orders" element={auth.token ? <Orders/> : <Navigate to="/login"/>}/>
               <Route path="/create-order" element={auth.token ? <OrderCreate/> : <Navigate to="/login"/>}/>
               <Route path="/orders/:orderId" element={auth.token ? <Order/> : <Navigate to="/login"/>}/>
-              <Route path="/edit-order/:ordersId" element={auth.token ? <OrderEdit/> : <Navigate to="/login"/>}/>
+              <Route path="/orders/:orderId/edit" element={auth.token ? <OrderEdit/> : <Navigate to="/login"/>}/>
 
               <Route path="/catalog" element={auth.token ? <Products/> : <Navigate to="/login"/>}/>
               <Route path="/products/:productId" element={auth.token ? <Product/> : <Navigate to="/login"/>}/>

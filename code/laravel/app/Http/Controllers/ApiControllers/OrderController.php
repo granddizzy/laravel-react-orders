@@ -202,19 +202,50 @@ class OrderController extends Controller {
 
         // Валидируем данные запроса
         $validated = $request->validate([
-            'status' => 'required|in:pending,confirmed,shipped,completed,cancelled',
-            'total_amount' => 'required|numeric',
             'shipping_address' => 'nullable|string',
-            'billing_address' => 'nullable|string',
-            'ordered_at' => 'nullable|date',
-            'shipped_at' => 'nullable|date',
-            'completed_at' => 'nullable|date',
+            'contractor_id' => 'required|exists:contractors,id',  // Привязка к контрагенту
+            'products' => 'required|array',  // Продукты, связанные с заказом
+            'products.*.product_id' => 'required|exists:products,id',  // Каждый продукт должен существовать
+            'products.*.quantity' => 'required|numeric|min:1',  // Количество каждого продукта
+            'products.*.price' => 'required|numeric|min:0',  // Цена каждого продукта
+            'notes' => 'nullable|string',  // Поле для заметок
         ]);
 
-        // Обновляем заказ
-        $order->update($validated);
+        $products = $request->input('products', []);
 
-        return response()->json($order);
+        $total_amount = 0;
+        foreach ($products as $product) {
+            $total_amount += $product['quantity'] * $product['price'];
+        }
+
+        // Используем транзакцию
+        DB::beginTransaction();
+
+        try {
+            $order->update([
+                'shipping_address' => $validated['shipping_address'],
+                'contractor_id' => $validated['contractor_id'],
+                'total_amount' => $total_amount,
+                'notes' => $validated['notes'],
+            ]);
+
+            // Удаляем все текущие продукты
+            $order->products()->detach();
+
+            // Добавляем новые продукты
+            foreach ($products as $product) {
+                $order->products()->attach($product['product_id'], [
+                    'quantity' => $product['quantity'],
+                    'price' => $product['price'],
+                ]);
+            }
+            DB::commit(); // Фиксируем транзакцию
+            return response()->json($order, 201);
+        } catch (\Exception $e) {
+            DB::rollBack(); // Откатываем транзакцию в случае ошибки
+            Log::error('Error updating order', ['error' => $e->getMessage()]);
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
