@@ -65,7 +65,7 @@ function OrderCreate() {
   };
 
   const debouncedFetchProducts = React.useCallback(
-    debounce((index, value) => fetchProducts(index, value), 100)
+    debounce((index, value) => fetchProducts(index, value), 1000)
   );
 
   // Поиск номенклатуры для всех позиций в заказе
