@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Typography,
   Box,
@@ -19,7 +19,6 @@ import {useApi} from '../contexts/apiContext';
 import {useNavigate} from "react-router-dom";
 import {useSelector} from "react-redux";
 import debounce from "lodash.debounce";
-import {setSearch} from "../redux/ordersSlice";
 
 function OrderCreate() {
   const apiUrl = useApi();
@@ -42,6 +41,21 @@ function OrderCreate() {
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('md')); // Проверка на маленький экран
+
+  const cartProducts = useSelector((state) => state.cart.products);
+
+  useEffect(() => {
+    // Заполняем products из cartProducts при первом рендере
+    if (cartProducts?.length) {
+      const filteredProducts = cartProducts.map(({name, id, price, quantity}) => ({
+        name,
+        product_id: id,
+        price: parseFloat(price),
+        quantity: parseFloat(quantity),
+      }));
+      setOrder((prev) => ({...prev, products: filteredProducts}));
+    }
+  }, [cartProducts]);
 
   const debouncedFetchContractors = React.useCallback(
     debounce((value) => fetchContractors(value), 1000)
@@ -131,9 +145,9 @@ function OrderCreate() {
       updatedItems[index][field] = numericValue;
     }
     if (field === 'name') {
-      updatedItems[index][field] = value;
-      updatedItems[index]['product_id'] = value.id;
-      updatedItems[index]['price'] = parseFloat(value.price);
+      updatedItems[index]["name"] = value.name;
+      updatedItems[index]["product_id"] = value.id;
+      updatedItems[index]["price"] = value.price;
     } else {
       updatedItems[index][field] = value;
     }
@@ -268,7 +282,7 @@ function OrderCreate() {
                   getOptionLabel={(option) => option.name}
                   onInputChange={(e, value) => handleProductSearch(index, e, value)}
                   onChange={(e, value) => handleItemChange(index, 'name', value)}
-                  value={item.name || null}
+                  value={item}
                   loading={loadingProducts[index] || false}
                   renderInput={(params) => (
                     <TextField
@@ -325,7 +339,7 @@ function OrderCreate() {
                       getOptionLabel={(option) => option.name}
                       onInputChange={(e, value) => handleProductSearch(index, e, value)}
                       onChange={(e, value) => handleItemChange(index, 'name', value)}
-                      value={item.name || null}
+                      value={item}
                       loading={loadingProducts[index] || false}
                       renderInput={(params) => (
                         <TextField

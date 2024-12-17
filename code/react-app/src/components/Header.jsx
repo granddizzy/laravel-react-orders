@@ -92,6 +92,9 @@ function Header() {
                   open={Boolean(anchorEl)}
                   onClose={handleMenuClose}
                 >
+                  <MenuItem component={Link} to="/cart" onClick={handleMenuClose}>
+                    Корзина
+                  </MenuItem>
                   <MenuItem component={Link} to="/profile" onClick={handleMenuClose}>
                     Профиль
                   </MenuItem>

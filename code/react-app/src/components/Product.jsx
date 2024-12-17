@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Typography,
   Box,
@@ -7,36 +7,43 @@ import {
   CardContent,
   CardMedia, CircularProgress,
 } from '@mui/material';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useApi } from '../contexts/apiContext';
-import { useSelector } from "react-redux";
-import defaultImage from '../img/default-product-image.png'; // Импорт заглушки
+import {useNavigate, useParams} from 'react-router-dom';
+import {useApi} from '../contexts/apiContext';
+import {useDispatch, useSelector} from "react-redux";
+import defaultImage from '../img/default-product-image.png';
+import {addProduct, removeProduct} from "../redux/cartSlice"; // Импорты экшенов
 
 function ProductView() {
-  const { productId } = useParams(); // Получаем id продукта из URL
+  const {productId} = useParams(); // Получаем id продукта из URL
   const navigate = useNavigate();
   const apiUrl = useApi();
   const [isLoading, setIsLoading] = useState(false);
   const [product, setProduct] = useState(null);
   const [error, setError] = useState(null);
 
+  const cartProducts = useSelector((state) => state.cart.products);
   const token = useSelector((state) => state.auth.token);
 
-  // Функция для загрузки данных о продукте
+  const dispatch = useDispatch();
+
+  // Проверка: есть ли продукт в корзине
+  const isInCart = cartProducts.some(p => p.id === product?.id);
+
+  // Загрузка данных о продукте
   useEffect(() => {
     const fetchProduct = async () => {
       setIsLoading(true);
       try {
-        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const headers = token ? {Authorization: `Bearer ${token}`} : {};
         const response = await fetch(`${apiUrl}/products/${productId}`, {
-          method: 'GET', // Указываем метод запроса, по умолчанию 'GET'
-          headers, // Заголовки, включая токен, если он есть
+          method: 'GET',
+          headers,
         });
         if (!response.ok) {
           throw new Error('Продукт не найден');
         }
         const data = await response.json();
-        setProduct(data); // Заполняем данные продукта
+        setProduct(data);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -45,15 +52,24 @@ function ProductView() {
     };
 
     fetchProduct();
-  }, [apiUrl, productId]);
+  }, [apiUrl, productId, token]);
 
-  // Функция для перехода к странице редактирования продукта
-  const handleEdit = () => {
-    navigate(`/edit-product/${productId}`);
+  // Добавить в корзину
+  const handleAddInCart = () => {
+    if (product) {
+      dispatch(addProduct({...product, quantity: 1})); // Добавляем продукт с количеством 1
+    }
+  };
+
+  // Удалить из корзины
+  const handleRemoveFromCart = () => {
+    if (product) {
+      dispatch(removeProduct(product.id));
+    }
   };
 
   if (isLoading) {
-    return <CircularProgress />;
+    return <CircularProgress/>;
   }
 
   if (error) {
@@ -81,7 +97,7 @@ function ProductView() {
             component="img"
             alt={product.name}
             height="340"
-            image={product.image || defaultImage} // Используем заглушку, если изображения нет
+            image={product.image || defaultImage}
           />
           <CardContent>
             <Typography variant="h6" gutterBottom>
@@ -103,8 +119,8 @@ function ProductView() {
         </Card>
       )}
 
-      {/* Кнопки "Назад" и "Редактировать" */}
-      <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
+      {/* Кнопки управления */}
+      <Box sx={{mt: 2, display: 'flex', gap: 2}}>
         <Button
           variant="outlined"
           color="secondary"
@@ -112,10 +128,30 @@ function ProductView() {
         >
           Назад
         </Button>
+
+        {/* Динамическая кнопка "В корзину" или "Из корзины" */}
+        {isInCart ? (
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleRemoveFromCart}
+          >
+            Из корзины
+          </Button>
+        ) : (
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleAddInCart}
+          >
+            В корзину
+          </Button>
+        )}
+
         <Button
           variant="contained"
           color="primary"
-          onClick={handleEdit}
+          onClick={() => navigate(`/edit-product/${productId}`)}
         >
           Редактировать
         </Button>

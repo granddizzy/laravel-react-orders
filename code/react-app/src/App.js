@@ -25,6 +25,7 @@ import Contractor from "./components/Contractor";
 import ContractorEdit from "./components/ContractorEdit";
 import OrderEdit from "./components/OrderEdit";
 import Order from "./components/Order";
+import OrderCart from "./components/OrderCart";
 
 const baseUrl = "";
 // const baseUrl = "/orders-app";
@@ -69,7 +70,7 @@ function App() {
               <Route path="/contractors/:contractorId" element={auth.token ? <Contractor/> : <Navigate to="/login"/>}/>
               <Route path="/edit-contractor/:contractorId" element={auth.token ? <ContractorEdit/> : <Navigate to="/login"/>}/>
 
-
+              <Route path="/cart" element={auth.token ? <OrderCart/> : <Navigate to="/login"/>}/>s
 
               {/* Регистрация */}
               <Route path="/register" element={<Registration/>}/> {/* Обёрнутый компонент */}
