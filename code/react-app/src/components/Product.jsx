@@ -120,42 +120,47 @@ function ProductView() {
       )}
 
       {/* Кнопки управления */}
-      <Box sx={{mt: 2, display: 'flex', gap: 2}}>
-        <Button
-          variant="outlined"
-          color="secondary"
-          onClick={() => navigate("/catalog")}
-        >
-          Назад
-        </Button>
-
-        {/* Динамическая кнопка "В корзину" или "Из корзины" */}
-        {isInCart ? (
+      <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {/* Верхняя строка с кнопками "Назад" и "В корзину" */}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Button
-            variant="contained"
-            color="error"
-            onClick={handleRemoveFromCart}
+            variant="outlined"
+            color="secondary"
+            onClick={() => navigate("/catalog")}
           >
-            Из корзины
+            Назад
           </Button>
-        ) : (
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleAddInCart}
-          >
-            В корзину
-          </Button>
-        )}
 
+          {isInCart ? (
+            <Button
+              variant="contained"
+              color="error"
+              onClick={handleRemoveFromCart}
+            >
+              Из корзины
+            </Button>
+          ) : (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleAddInCart}
+            >
+              В корзину
+            </Button>
+          )}
+        </Box>
+
+        {/* Кнопка "Редактировать" на всю ширину */}
         <Button
           variant="contained"
           color="primary"
+          fullWidth
           onClick={() => navigate(`/edit-product/${productId}`)}
         >
           Редактировать
         </Button>
       </Box>
+
     </Box>
   );
 }
