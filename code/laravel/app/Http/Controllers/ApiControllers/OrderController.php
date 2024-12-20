@@ -3,6 +3,8 @@
 namespace app\Http\Controllers\ApiControllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\OrderResource;
+use App\Http\Resources\ProductResource;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -12,44 +14,6 @@ class OrderController extends Controller {
     /**
      * Display a listing of the resource.
      */
-    //    public function index(Request $request) {
-    //        // Валидируем входящие параметры
-    //        $validated = $request->validate([
-    //            'per_page' => 'integer|min:1|max:100', // Количество заказов на странице
-    //            'page' => 'integer|min:1', // Номер страницы
-    //            'search' => 'nullable|string', // Строка поиска
-    //        ]);
-    //
-    //        // Получаем параметры из запроса
-    //        $perPage = $validated['per_page'] ?? 10;
-    //        $page = $validated['page'] ?? 1;
-    //        $search = $validated['search'] ?? null;
-    //
-    //        // Строим запрос
-    //        $query = Order::query()->with(['contractor', 'products']); // Подгружаем связанные модели
-    //
-    //        // Если передана строка поиска, добавляем фильтрацию
-    //        if ($search) {
-    //            $query->where(function ($q) use ($search) {
-    //                // Поиск по контрагенту
-    //                $q->whereHas('contractor', function ($contractorQuery) use ($search) {
-    //                    $contractorQuery->where('name', 'like', '%' . $search . '%');
-    //                });
-    //
-    //                // Поиск по продукту
-    //                $q->orWhereHas('products', function ($productQuery) use ($search) {
-    //                    $productQuery->where('name', 'like', '%' . $search . '%')
-    //                        ->orWhere('sku', 'like', '%' . $search . '%'); // Пример поиска по SKU
-    //                });
-    //            });
-    //        }
-    //
-    //        // Применяем пагинацию
-    //        $orders = $query->paginate($perPage, ['*'], 'page', $page);
-    //
-    //        // Возвращаем данные в формате JSON
-    //        return response()->json($orders);
-    //    }
     public function index(Request $request) {
         // Валидируем входящие параметры
         $validated = $request->validate([
@@ -73,7 +37,6 @@ class OrderController extends Controller {
             $query->where(function ($q) use ($search) {
                 // Фильтрация по полям самого заказа
                 $q->where('shipping_address', 'like', '%' . $search . '%')  // Поиск по адресу доставки
-                ->orWhere('billing_address', 'like', '%' . $search . '%')  // Поиск по адресу для счета
                 ->orWhere('id', 'like', '%' . $search . '%')  // Поиск по ID заказа
                 // Фильтрация по имени контрагента
                 ->orWhereHas('contractor', function ($query) use ($search) {
@@ -90,7 +53,15 @@ class OrderController extends Controller {
         $orders = $query->paginate($perPage, ['*'], 'page', $page);
 
         // Возвращаем результат в формате JSON
-        return response()->json($orders);
+        //        return response()->json($orders);
+        // Возвращаем результат без лишней вложенности data
+        return response()->json([
+            'data' => OrderResource::collection($orders), // Каждый заказ через OrderResource
+            'current_page' => $orders->currentPage(),
+            'last_page' => $orders->lastPage(),
+//            'per_page' => $orders->perPage(),
+//            'total' => $orders->total(),
+        ]);
     }
 
     /**
@@ -108,7 +79,6 @@ class OrderController extends Controller {
         $validated = $request->validate([
             'shipping_address' => 'nullable|string',
             //            'billing_address' => 'nullable|string',
-            //            'organization_id' => 'required|exists:organizations,id',  // Привязка к организации
             'contractor_id' => 'required|exists:contractors,id',  // Привязка к контрагенту
             'products' => 'required|array',  // Продукты, связанные с заказом
             'products.*.product_id' => 'required|exists:products,id',  // Каждый продукт должен существовать
@@ -132,7 +102,7 @@ class OrderController extends Controller {
             $order = Order::create([
                 'user_id' => $userId,
                 'shipping_address' => $validated['shipping_address'],
-                //            'billing_address' => $validated['billing_address'],
+                //                'billing_address' => $validated['billing_address'],
                 'contractor_id' => $validated['contractor_id'],
                 'total_amount' => $total_amount,
                 'notes' => $validated['notes'],
@@ -146,7 +116,10 @@ class OrderController extends Controller {
                 ]);
             }
             DB::commit(); // Фиксируем транзакцию
-            return response()->json($order, 201);
+            //                        return response()->json($order, 201);
+            return (new OrderResource($order))
+                ->response()
+                ->setStatusCode(201);
         } catch (\Exception $e) {
             DB::rollBack(); // Откатываем транзакцию в случае ошибки
             Log::error('Error creating order', ['error' => $e->getMessage()]);
@@ -173,10 +146,11 @@ class OrderController extends Controller {
 
         $orderArray = $order->toArray();
         try {
-            Log::info('Order data: ', ['order' => $order->toArray()]);
-            return response()->json($orderArray);
+            //            Log::info('Order data: ', ['order' => $order->toArray()]);
+            //            return response()->json($orderArray);
+            return new OrderResource($order);
         } catch (\Exception $e) {
-            Log::error('Error fetching order:', ['error' => $e->getMessage()]);
+            //            Log::error('Error fetching order:', ['error' => $e->getMessage()]);
             return response()->json(['message' => 'Order not found'], 404);
         }
     }
@@ -240,7 +214,8 @@ class OrderController extends Controller {
                 ]);
             }
             DB::commit(); // Фиксируем транзакцию
-            return response()->json($order, 201);
+            //            return response()->json($order, 201);
+            return (new OrderResource($order));
         } catch (\Exception $e) {
             DB::rollBack(); // Откатываем транзакцию в случае ошибки
             Log::error('Error updating order', ['error' => $e->getMessage()]);

@@ -40,7 +40,13 @@ class ProductController extends Controller {
 
         // Возвращаем данные в формате JSON
         //        return response()->json($products);
-        return ProductResource::collection($products);
+        return response()->json([
+            'data' => ProductResource::collection($products),
+            'current_page' => $products->currentPage(),
+            'last_page' => $products->lastPage(),
+//            'per_page' => $products->perPage(),
+//            'total' => $products->total(),
+        ]);
     }
 
     /**
