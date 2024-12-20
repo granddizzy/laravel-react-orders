@@ -11,7 +11,6 @@ import { useApi } from '../contexts/apiContext';
 import { useNavigate, useParams } from 'react-router-dom';
 
 function ProductEdit() {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { productId } = useParams(); // Получаем id продукта из URL
   const apiUrl = useApi();

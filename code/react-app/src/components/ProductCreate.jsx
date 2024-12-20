@@ -71,7 +71,7 @@ function ProductCreate() {
       }
 
       // После успешного создания обновляем список продуктов
-      navigate('/catalog');
+      navigate('/products');
     } catch (err) {
       setError(err.message);
     } finally {

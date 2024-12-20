@@ -53,4 +53,9 @@ class User extends \TCG\Voyager\Models\User {
     {
         return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id');
     }
+
+    public function contractors()
+    {
+        return $this->belongsToMany(Contractor::class, 'user_contractor', 'user_id', 'contractor_id');
+    }
 }

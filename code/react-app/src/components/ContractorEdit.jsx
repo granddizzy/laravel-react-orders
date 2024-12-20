@@ -11,7 +11,6 @@ import {useApi} from '../contexts/apiContext';
 import {useNavigate, useParams} from 'react-router-dom';
 
 function ContractorEdit() {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const {contractorId} = useParams(); // Получаем id из URL
   const apiUrl = useApi();

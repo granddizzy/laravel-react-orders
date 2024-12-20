@@ -6,7 +6,7 @@ export const fetchOrders = createAsyncThunk(
   async ({url, token}) => {
     try {
       // Формируем заголовки с токеном
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const headers = token ? {Authorization: `Bearer ${token}`} : {};
       const response = await axios.get(url, {headers});
       if (response.status !== 200) {
         throw new Error(`Error: ${response.statusText}`);
@@ -63,5 +63,9 @@ const ordersSlice = createSlice({
   },
 });
 
-export const {setPage, clearOrders, setPageSize, setSearch} = ordersSlice.actions;
+export const {
+  setPage, clearOrders,
+  setPageSize,
+  setSearch
+} = ordersSlice.actions;
 export default ordersSlice.reducer;

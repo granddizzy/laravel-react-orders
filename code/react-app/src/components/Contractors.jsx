@@ -64,7 +64,7 @@ function Contractors() {
           variant="contained"
           color="primary"
           component={Link}
-          to="/create-contractor"
+          to="/contractors/create"
         >
           Добавить контрагента
         </Button>

@@ -49,7 +49,7 @@ function ContractorView() {
 
   // Функция для перехода к странице редактирования продукта
   const handleEdit = () => {
-    navigate(`/edit-contractor/${contractorId}`);
+    navigate(`/contractors/${contractorId}/edit`);
   };
 
   if (isLoading) {

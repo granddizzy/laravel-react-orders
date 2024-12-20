@@ -49,7 +49,7 @@ function Orders() {
           variant="contained"
           color="primary"
           component={Link}
-          to="/create-order"
+          to="/orders/create"
         >
           Создать заказ
         </Button>

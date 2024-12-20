@@ -126,7 +126,7 @@ function ProductView() {
           <Button
             variant="outlined"
             color="secondary"
-            onClick={() => navigate("/catalog")}
+            onClick={() => navigate("/products")}
           >
             Назад
           </Button>
@@ -155,7 +155,7 @@ function ProductView() {
           variant="contained"
           color="primary"
           fullWidth
-          onClick={() => navigate(`/edit-product/${productId}`)}
+          onClick={() => navigate(`/products/${productId}/edit`)}
         >
           Редактировать
         </Button>

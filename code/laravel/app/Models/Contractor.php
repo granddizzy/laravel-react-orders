@@ -25,4 +25,10 @@ class Contractor extends Model {
   public function orders() {
     return $this->hasMany(Order::class);
   }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'user_contractor',
+            'contractor_id', 'user_id');
+    }
 }

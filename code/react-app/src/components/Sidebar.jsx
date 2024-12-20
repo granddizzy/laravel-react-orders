@@ -70,9 +70,9 @@ function Sidebar({ closeDrawer }) {
         <ListItem
           button
           component={Link}
-          to="/catalog"
+          to="/products"
           sx={{
-            backgroundColor: isActive('/catalog') ? 'lightgray' : 'transparent',
+            backgroundColor: isActive('/products') ? 'lightgray' : 'transparent',
             color: '#1976d2', // всегда голубой цвет
           }}
           onClick={closeDrawer} // Закрытие бокового меню при клике

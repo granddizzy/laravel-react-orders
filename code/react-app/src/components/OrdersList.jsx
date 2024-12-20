@@ -1,4 +1,3 @@
-// src/Products.jsx
 import React from 'react';
 import {
   Typography,

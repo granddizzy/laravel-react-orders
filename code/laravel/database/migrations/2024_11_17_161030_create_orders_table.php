@@ -12,7 +12,6 @@ return new class extends Migration {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            //            $table->foreignId('organization_id')->constrained()->onDelete('cascade');  // Организация, которая создала заказ
             $table->foreignId('contractor_id')->constrained()->onDelete('cascade');  // Контрагент, для которого создан заказ
             $table->foreignId('user_id')->constrained()->onDelete('cascade');  // Пользователь, который создал заказ
             $table->enum('status', ['pending', 'confirmed', 'shipped', 'completed', 'cancelled'])->default('pending');  // Статус заказа

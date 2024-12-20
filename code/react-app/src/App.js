@@ -51,29 +51,28 @@ function App() {
               {/* Проверяем, если пользователь не авторизован, редиректим на страницу входа */}
               <Route path="/" element={auth.token ? <Navigate to="/home"/> : <Login/>}/>
               <Route path="/login" element={auth.token ? <Navigate to="/home"/> : <Login/>}/>
+              <Route path="/register" element={auth.token ? <Navigate to="/home"/> : <Registration/>}/>
 
               {/* Страницы, которые доступны только авторизованным пользователям */}
               <Route path="/home" element={auth.token ? <Home/> : <Navigate to="/login"/>}/>
 
               <Route path="/orders" element={auth.token ? <Orders/> : <Navigate to="/login"/>}/>
-              <Route path="/create-order" element={auth.token ? <OrderCreate/> : <Navigate to="/login"/>}/>
+              <Route path="/orders/create" element={auth.token ? <OrderCreate/> : <Navigate to="/login"/>}/>
               <Route path="/orders/:orderId" element={auth.token ? <Order/> : <Navigate to="/login"/>}/>
               <Route path="/orders/:orderId/edit" element={auth.token ? <OrderEdit/> : <Navigate to="/login"/>}/>
 
-              <Route path="/catalog" element={auth.token ? <Products/> : <Navigate to="/login"/>}/>
+              <Route path="/products" element={auth.token ? <Products/> : <Navigate to="/login"/>}/>
               <Route path="/products/:productId" element={auth.token ? <Product/> : <Navigate to="/login"/>}/>
-              <Route path="/create-product" element={auth.token ? <ProductCreate/> : <Navigate to="/login"/>}/>
-              <Route path="/edit-product/:productId" element={auth.token ? <ProductEdit/> : <Navigate to="/login"/>}/>
+              <Route path="/products/:productId/edit" element={auth.token ? <ProductEdit/> : <Navigate to="/login"/>}/>
+              <Route path="/products/create" element={auth.token ? <ProductCreate/> : <Navigate to="/login"/>}/>
 
               <Route path="/clients" element={auth.token ? <Contractors/> : <Navigate to="/login"/>}/>
-              <Route path="/create-contractor" element={auth.token ? <ContractorCreate/> : <Navigate to="/login"/>}/>
+              <Route path="/contractors/create" element={auth.token ? <ContractorCreate/> : <Navigate to="/login"/>}/>
               <Route path="/contractors/:contractorId" element={auth.token ? <Contractor/> : <Navigate to="/login"/>}/>
-              <Route path="/edit-contractor/:contractorId" element={auth.token ? <ContractorEdit/> : <Navigate to="/login"/>}/>
+              <Route path="/contractors/:contractorId/edit" element={auth.token ? <ContractorEdit/> : <Navigate to="/login"/>}/>
 
               <Route path="/cart" element={auth.token ? <OrderCart/> : <Navigate to="/login"/>}/>s
 
-              {/* Регистрация */}
-              <Route path="/register" element={<Registration/>}/> {/* Обёрнутый компонент */}
               <Route path="/profile" element={auth.token ? <Profile/> : <Navigate to="/login"/>}/>
             </Routes>
           </Box>
