@@ -21,6 +21,7 @@ import {useApi} from '../contexts/apiContext';
 import {useNavigate, useParams} from "react-router-dom";
 import {useSelector} from "react-redux";
 import debounce from "lodash.debounce";
+import contractor from "./Contractor";
 
 function OrderEdit() {
   const apiUrl = useApi();
@@ -38,7 +39,7 @@ function OrderEdit() {
   const [order, setOrder] = useState(false);
   const [formData, setformData] = useState({
     contractor_id: null,
-    contractor_name: null,
+    contractor: null,
     shipping_address: '',
     products: [],
     notes: '',
@@ -63,25 +64,21 @@ function OrderEdit() {
           throw new Error('Заказ не найден');
         }
         const data = await response.json();
-        //setOrder(data);
 
         // Заполнение formData
         setformData({
           id: data.id,
           contractor: data.contractor,
-          contractor_id: data.contractor_id,
-          contractor_name: data.contractor.name,
+          contractor_id: data.contractor.id,
           shipping_address: data.shipping_address,
           products: data.products.map(product => ({
-            product: product,
-            product_id: product.pivot.product_id,
-            product_name: product.name,
-            quantity: parseFloat(product.pivot.quantity),
-            price: parseFloat(product.pivot.price),
+            ...product,
+            product_id: product.id,
+            quantity: parseFloat(product.quantity),
+            price: parseFloat(product.price),
           })),
           notes: data.notes || '',
         });
-        console.log("Срабоала загрузка");
       } catch (err) {
         setError(err.message);
       } finally {
@@ -133,7 +130,6 @@ function OrderEdit() {
       const headers = token ? {Authorization: `Bearer ${token}`} : {};
       const response = await fetch(`${apiUrl}/products?search=${search}`, {headers});
       const result = await response.json();
-      console.log(result)
       setProductOptions((prev) => {
         const updatedOptions = [...prev];
         updatedOptions[index] = result.data; // Обновить продукты для конкретного индекса
@@ -170,9 +166,18 @@ function OrderEdit() {
       if (isNaN(numericValue) || numericValue <= 0) return;
       updatedItems[index][field] = numericValue;
     } else if (field === 'name') {
-      updatedItems[index][field] = value;
-      updatedItems[index]['product_id'] = value?.id || null;
-      updatedItems[index]['price'] = parseFloat(value.price);
+      const prevQuantity =  updatedItems[index]?.quantity;
+      if (value) {
+        updatedItems[index] = value;
+        updatedItems[index]['product_id'] = value?.id || null;
+        updatedItems[index]['price'] = parseFloat(value.price);
+        updatedItems[index]['quantity'] = prevQuantity;
+      } else {
+        updatedItems[index] = null;
+        updatedItems[index]["product_id"] = null;
+        updatedItems[index]["price"] = 0;
+        updatedItems[index]["quantity"] = prevQuantity;
+      }
     }
     setformData((prev) => ({...prev, products: updatedItems}));
   };
@@ -193,7 +198,6 @@ function OrderEdit() {
         'Content-Type': 'application/json',
         Accept: 'application/json',
       };
-      console.log(formData);
       const response = await fetch(`${apiUrl}/orders/${orderId}`, {
         method: 'PUT',
         headers,
@@ -240,7 +244,8 @@ function OrderEdit() {
         options={contractorOptions}
         getOptionLabel={(option) => option.name}
         onInputChange={handleContractorSearch}
-        onChange={(event, value) => setformData((prev) => ({...prev, contractor_id: value?.id || null}))}
+        onChange={(event, value) => setformData(
+          (prev) => ({...prev, contractor: value || null, contractor_id: value?.id}))}
         loading={loadingContractors}
         value={formData.contractor}
         renderInput={(params) => (
@@ -277,7 +282,7 @@ function OrderEdit() {
                   getOptionLabel={(option) => option.name}
                   onInputChange={(e, value) => handleProductSearch(index, e, value)}
                   onChange={(e, value) => handleItemChange(index, 'name', value)}
-                  value={item.product}
+                  value={item}
                   loading={loadingProducts[index] || false}
                   renderInput={(params) => (
                     <TextField
@@ -328,11 +333,11 @@ function OrderEdit() {
                 <TableRow key={index}>
                   <TableCell sx={{width: '50%'}}>
                     <Autocomplete
-                      options={productOptions}
+                      options={productOptions[index] || []}
                       getOptionLabel={(option) => option.name}
                       onInputChange={(e, value) => handleProductSearch(index, e, value)}
                       onChange={(e, value) => handleItemChange(index, 'name', value)}
-                      value={item.product}
+                      value={item}
                       loading={loadingProducts[index] || false}
                       renderInput={(params) => (
                         <TextField

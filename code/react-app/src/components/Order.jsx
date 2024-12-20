@@ -43,6 +43,7 @@ function OrderView() {
         }
         const data = await response.json();
         setOrder(data); // Заполняем данные о заказе
+        console.log(data)
       } catch (err) {
         setError(err.message);
       } finally {
@@ -111,7 +112,7 @@ function OrderView() {
                 </Typography>
                 {order.products.map((item, index) => (
                   <Typography key={index} variant="body2" color="textSecondary">
-                    {item.name} — {item.pivot.quantity} шт. ({item.pivot.price} ₽)
+                    {item.name} — {item.quantity} шт. ({item.price} ₽)
                   </Typography>
                 ))}
               </Box>

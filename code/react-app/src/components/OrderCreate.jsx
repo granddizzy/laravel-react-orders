@@ -145,9 +145,15 @@ function OrderCreate() {
       updatedItems[index][field] = numericValue;
     }
     if (field === 'name') {
-      updatedItems[index]["name"] = value.name;
-      updatedItems[index]["product_id"] = value.id;
-      updatedItems[index]["price"] = value.price;
+      if (value) {
+        updatedItems[index]["name"] = value.name;
+        updatedItems[index]["product_id"] = value.id;
+        updatedItems[index]["price"] = value.price;
+      } else {
+        updatedItems[index]["name"] = ''; // Можно задать пустую строку или значение по умолчанию
+        updatedItems[index]["product_id"] = null;
+        updatedItems[index]["price"] = 0;
+      }
     } else {
       updatedItems[index][field] = value;
     }

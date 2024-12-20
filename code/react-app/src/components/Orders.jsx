@@ -14,7 +14,8 @@ function Orders() {
   const token = useSelector((state) => state.auth.token);
   const generateQueryParams = () => {
     const params = new URLSearchParams();
-    params.append("page", currentPage);
+    const page = typeof currentPage === 'number' && !isNaN(currentPage) ? currentPage : 1;
+    params.append("page", page);
     params.append("per_page", pageSize);
     if (search) params.append("search", search); // Добавляем параметр поиска, если он есть
     return params.toString();
