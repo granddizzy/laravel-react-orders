@@ -55,7 +55,6 @@ const ordersSlice = createSlice({
         state.totalPages = action.payload.last_page; // Обновляем количество страниц
         state.currentPage = action.payload.current_page;
         state.loading = false;
-        console.log(action.payload)
       })
       .addCase(fetchOrders.rejected, (state, action) => {
         state.loading = false;
