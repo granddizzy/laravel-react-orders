@@ -75,7 +75,7 @@ function ProductView() {
   if (error) {
     return <Typography color="error">{`${error}`}</Typography>;
   }
-
+  console.log(product)
   return (
     <Box
       sx={{
