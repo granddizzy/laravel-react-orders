@@ -11,7 +11,7 @@ import cartReducer from "./cartSlice";
 
 const persistConfig = {
   key: '8SUp0r0TYlKTPfmf5kr8wKz5pIIMX4B5_root',
-  storage: sessionStorage,
+  storage: localStorage,
   whitelist: ['auth'],
   // debug: true,
 };
