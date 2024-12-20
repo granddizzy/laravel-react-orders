@@ -33,6 +33,8 @@ function ContractorCreate() {
 
   const [error, setError] = useState(null);
 
+  const token = useSelector((state) => state.auth.token);
+
   // Обновление полей формы
   const handleChange = (event) => {
     const {name, value} = event.target;
@@ -47,13 +49,20 @@ function ContractorCreate() {
     event.preventDefault();
     setIsLoading(true); // Включаем индикатор загрузки
     try {
-      console.log(formData)
+      // Базовые заголовки
+      const headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      };
+
+      // Добавление токена, если он есть
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+
       const response = await fetch(`${apiUrl}/contractors`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
+        headers,
         body: JSON.stringify(formData),
       });
 

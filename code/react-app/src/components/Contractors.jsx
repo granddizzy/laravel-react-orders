@@ -28,8 +28,8 @@ function Contractors() {
 
   const generateQueryParams = () => {
     const params = new URLSearchParams();
-    params.append("page", currentPage);
-    params.append("page", currentPage);
+    const page = typeof currentPage === 'number' && !isNaN(currentPage) ? currentPage : 1;
+    params.append("page", page);
     params.append("per_page", pageSize);
     if (search) params.append("search", search);
     return params.toString();
