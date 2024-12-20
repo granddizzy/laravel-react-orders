@@ -99,7 +99,6 @@ const productsSlice = createSlice({
       const newestPage = state.products[state.products.length - 1]?.currentPage; // Получаем currentPage самых "новых" товаров
 
       if (newestPage - oldestPage > 2) {
-        // alert("удаляем старые")
         state.products = state.products.filter(
           (product) => product.currentPage !== oldestPage // Удаляем товары с самой младшей загруженной страницы
         );
@@ -112,7 +111,6 @@ const productsSlice = createSlice({
       const oldestPage = state.products[0]?.currentPage; // Получаем currentPage самых "старых" товаров
       const newestPage = state.products[state.products.length - 1]?.currentPage; // Получаем currentPage самых "новых" товаров
       if (newestPage - oldestPage > 2) {
-        // alert("удаляем новые")
         state.products = state.products.filter(
           (product) => product.currentPage !== newestPage // Удаляем товары с самой старшей загруженной страницы
         );
