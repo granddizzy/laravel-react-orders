@@ -8,26 +8,26 @@ use Illuminate\Database\Eloquent\Model;
 class Contractor extends Model {
     use HasFactory;
 
-  protected $fillable = [
-    'name',
-    'unp',
-    'contact_person',
-    'email',
-    'phone',
-    'address'
-  ];
+    protected $fillable = [
+        'name',
+        'unp',
+        'contact_person',
+        'email',
+        'phone',
+        'address'
+    ];
 
-  protected $casts = [
-    'created_at' => 'datetime',
-    'updated_at' => 'datetime',
-  ];
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'id' => 'int',
+    ];
 
-  public function orders() {
-    return $this->hasMany(Order::class);
-  }
+    public function orders() {
+        return $this->hasMany(Order::class);
+    }
 
-    public function users()
-    {
+    public function users() {
         return $this->belongsToMany(User::class, 'user_contractor',
             'contractor_id', 'user_id');
     }
