@@ -167,12 +167,12 @@ class OrderController extends Controller {
      */
     public function update(Request $request, string $id) {
         // Находим заказ по ID
-        $order = Order::find($id);
+        $order = Order::findOrFail($id);
 
         // Если заказ не найден, возвращаем ошибку
-        if (!$order) {
-            return response()->json(['message' => 'Order not found'], 404);
-        }
+//        if (!$order) {
+//            return response()->json(['message' => 'Order not found'], 404);
+//        }
 
         // Валидируем данные запроса
         $validated = $request->validate([
@@ -214,6 +214,10 @@ class OrderController extends Controller {
                 ]);
             }
             DB::commit(); // Фиксируем транзакцию
+
+            // Загружаем связанные данные (contractor, products) перед возвращением ресурса
+            $order->load('contractor', 'products');
+
             //            return response()->json($order, 201);
             return (new OrderResource($order));
         } catch (\Exception $e) {

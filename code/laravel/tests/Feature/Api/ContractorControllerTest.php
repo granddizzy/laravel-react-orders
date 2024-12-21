@@ -2,22 +2,22 @@
 
 namespace Tests\Feature\Api;
 
-use App\Models\Product;
+use App\Models\Contractor;
 use App\Models\User; // Импортируем модель User
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class ProductControllerTest extends TestCase
+class ContractorControllerTest extends TestCase
 {
     use RefreshDatabase;
 
     /**
-     * Тест получения списка продуктов.
+     * Тест получения списка контрагентов.
      */
-    public function test_can_get_product_list()
+    public function test_can_get_contractor_list()
     {
-        // Создаем несколько продуктов
-        Product::factory()->count(5)->create();
+        // Создаем несколько контрагентов
+        Contractor::factory()->count(5)->create();
 
         // Создаем пользователя и генерируем токен для Sanctum
         $user = User::factory()->create();
@@ -26,7 +26,7 @@ class ProductControllerTest extends TestCase
         // Выполняем запрос с токеном
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token, // Добавляем токен в заголовок
-        ])->getJson('/api/products');
+        ])->getJson('/api/contractors');
 
         // Проверяем статус ответа и структуру данных
         $response->assertStatus(200)
@@ -35,11 +35,11 @@ class ProductControllerTest extends TestCase
                     '*' => [
                         'id',
                         'name',
-                        'description',
-                        'price',
-                        'unit',
-                        'stock_quantity',
-                        'sku',
+                        'unp',
+                        'contact_person',
+                        'email',
+                        'phone',
+                        'address',
                     ],
                 ],
                 'current_page',
@@ -48,17 +48,17 @@ class ProductControllerTest extends TestCase
     }
 
     /**
-     * Тест создания нового продукта.
+     * Тест создания нового контрагента.
      */
-    public function test_can_create_product()
+    public function test_can_create_contractor()
     {
         $data = [
-            'name' => 'Test Product',
-            'description' => 'Test Description',
-            'price' => 99.99,
-            'unit' => 'pcs',
-            'stock_quantity' => 10,
-            'sku' => 'TEST1234',
+            'name' => 'Test Contractor',
+            'unp' => '123456789',
+            'contact_person' => 'John Doe',
+            'email' => 'test@example.com',
+            'phone' => '+1234567890',
+            'address' => '123 Test Street',
         ];
 
         // Создаем пользователя и генерируем токен для Sanctum
@@ -68,26 +68,26 @@ class ProductControllerTest extends TestCase
         // Выполняем запрос с токеном
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
-        ])->postJson('/api/products', $data);
+        ])->postJson('/api/contractors', $data);
 
         // Проверяем статус ответа и структуру данных
         $response->assertStatus(201)
             ->assertJsonFragment([
-                'name' => 'Test Product',
-                'price' => 99.99,
+                'name' => 'Test Contractor',
+                'unp' => '123456789',
             ]);
 
-        // Убедимся, что продукт был сохранен в базе данных
-        $this->assertDatabaseHas('products', $data);
+        // Убедимся, что контрагент был сохранен в базе данных
+        $this->assertDatabaseHas('contractors', $data);
     }
 
     /**
-     * Тест получения продукта по ID.
+     * Тест получения контрагента по ID.
      */
-    public function test_can_show_product()
+    public function test_can_show_contractor()
     {
-        // Создаем продукт
-        $product = Product::factory()->create();
+        // Создаем контрагента
+        $contractor = Contractor::factory()->create();
 
         // Создаем пользователя и генерируем токен для Sanctum
         $user = User::factory()->create();
@@ -96,28 +96,28 @@ class ProductControllerTest extends TestCase
         // Выполняем запрос с токеном
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
-        ])->getJson("/api/products/{$product->id}");
+        ])->getJson("/api/contractors/{$contractor->id}");
 
         // Проверяем статус ответа и структуру данных
         $response->assertStatus(200)
             ->assertJsonFragment([
-                'id' => $product->id,
-                'name' => $product->name,
+                'id' => $contractor->id,
+                'name' => $contractor->name,
             ]);
     }
 
     /**
-     * Тест обновления продукта.
+     * Тест обновления контрагента.
      */
-    public function test_can_update_product()
+    public function test_can_update_contractor()
     {
-        // Создаем продукт
-        $product = Product::factory()->create();
+        // Создаем контрагента
+        $contractor = Contractor::factory()->create();
 
         // Новые данные для обновления
         $data = [
-            'name' => 'Updated Product Name',
-            'price' => 199.99,
+            'name' => 'Updated Contractor Name',
+            'email' => 'updated@example.com',
         ];
 
         // Создаем пользователя и генерируем токен для Sanctum
@@ -127,26 +127,26 @@ class ProductControllerTest extends TestCase
         // Выполняем запрос с токеном
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
-        ])->putJson("/api/products/{$product->id}", $data);
+        ])->putJson("/api/contractors/{$contractor->id}", $data);
 
         // Проверяем статус ответа и обновленные данные
         $response->assertStatus(200)
             ->assertJsonFragment([
-                'name' => 'Updated Product Name',
-                'price' => 199.99,
+                'name' => 'Updated Contractor Name',
+                'email' => 'updated@example.com',
             ]);
 
         // Убедимся, что данные были обновлены в базе
-        $this->assertDatabaseHas('products', $data);
+        $this->assertDatabaseHas('contractors', $data);
     }
 
     /**
-     * Тест удаления продукта.
+     * Тест удаления контрагента.
      */
-    public function test_can_delete_product()
+    public function test_can_delete_contractor()
     {
-        // Создаем продукт
-        $product = Product::factory()->create();
+        // Создаем контрагента
+        $contractor = Contractor::factory()->create();
 
         // Создаем пользователя и генерируем токен для Sanctum
         $user = User::factory()->create();
@@ -155,15 +155,16 @@ class ProductControllerTest extends TestCase
         // Выполняем запрос с токеном
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
-        ])->deleteJson("/api/products/{$product->id}");
+        ])->deleteJson("/api/contractors/{$contractor->id}");
 
         // Проверяем статус ответа
         $response->assertStatus(200)
             ->assertJsonFragment([
-                'message' => 'Product deleted successfully',
+                'message' => 'Contractor deleted successfully',
             ]);
 
-        // Убедимся, что продукт был удален из базы
-        $this->assertDatabaseMissing('products', ['id' => $product->id]);
+        // Убедимся, что контрагент был удален из базы
+        $this->assertDatabaseMissing('contractors', ['id' => $contractor->id]);
     }
 }
+
