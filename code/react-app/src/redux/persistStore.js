@@ -1,6 +1,7 @@
 import {configureStore} from '@reduxjs/toolkit';
 import {persistReducer, persistStore} from 'redux-persist';
 import sessionStorage from 'redux-persist/lib/storage/session';
+import localStorage from 'redux-persist/lib/storage';
 import {combineReducers} from 'redux';
 import authReducer from './authSlice';
 import productReducer from "./productsSlice";
