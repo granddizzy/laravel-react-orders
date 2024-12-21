@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use TCG\Voyager\Models\Role;
 
 class AuthController extends Controller {
     public function register(Request $request) {
@@ -26,13 +27,16 @@ class AuthController extends Controller {
             'password' => Hash::make($request->password),
         ]);
 
+        $userRole = Role::firstOrCreate(['name' => 'user', 'display_name' => 'Пользователь']);
+        //        $userRole = Role::where('name', 'user')->first();
         // добавляем роль пользователя
-        DB::table('user_roles')->updateOrInsert(
-            [
-                'user_id' => $user->id,
-                'role_id' => 2,
-            ]
-        );
+        $user->roles()->attach($userRole);
+        //        DB::table('user_roles')->updateOrInsert(
+        //            [
+        //                'user_id' => $user->id,
+        //                'role_id' => $userRole->id,
+        //            ]
+        //        );
 
         return response()->json(['message' => 'User registered successfully'], 201);
     }
