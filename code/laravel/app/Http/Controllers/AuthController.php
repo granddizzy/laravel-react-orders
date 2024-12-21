@@ -178,7 +178,7 @@ class AuthController extends Controller {
         if (!$currentUser->hasRole('admin')) {
             return response()->json(['error' => 'У вас нет прав для удаления пользователя'], 403);
         }
-        
+
         // Проверка, существует ли пользователь с данным id
         $user = User::find($id);
 
