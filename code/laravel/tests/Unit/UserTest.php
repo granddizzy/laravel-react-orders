@@ -86,4 +86,21 @@ class UserTest extends TestCase
         // Проверяем, что email_verified_at не пустой
         $this->assertNotNull($user->email_verified_at);
     }
+
+    public function user_can_be_deleted()
+    {
+        // Создаем пользователя
+        $user = User::factory()->create();
+
+        // Сохраняем ID пользователя перед удалением
+        $userId = $user->id;
+
+        // Удаляем пользователя
+        $user->delete();
+
+        // Проверяем, что пользователь был удален из базы данных
+        $this->assertDatabaseMissing('users', [
+            'id' => $userId,
+        ]);
+    }
 }

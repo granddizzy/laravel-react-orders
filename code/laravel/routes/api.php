@@ -27,16 +27,13 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->group(function () {
 //Route::middleware([])->group(function () {
     // Ресурсные маршруты для сущностей
-    Route::apiResource('organizations', OrganizationController::class); // организации
     Route::apiResource('contractors', ContractorController::class); // контрагенты
-    Route::apiResource('managers', ManagerController::class);          // Менеджеры
     Route::apiResource('products', ProductController::class);          // Продукты (номенклатура)
     Route::apiResource('orders', OrderController::class);              // Заказы
 
     // Дополнительные маршруты
     Route::get('orders/{order}/products', [OrderController::class, 'getProducts']); // Продукты в заказе
     Route::post('orders/{order}/add-product', [OrderController::class, 'addProduct']); // Добавление товара в заказ
-    Route::get('managers/{manager}/orders', [ManagerController::class, 'getOrders']); // Заказы менеджера
     Route::get('contractors/{contractor}/orders', [ContractorController::class, 'getOrders']); // Заказы контрагента
 });
 
@@ -45,6 +42,5 @@ Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->put('/profile', [AuthController::class, 'updateProfile']);
 Route::middleware('auth:sanctum')->get('/profile', [AuthController::class, 'getUserData']);
+Route::middleware('auth:sanctum')->delete('/profile/{id}', [AuthController::class, 'deleteUser']);
 Route::middleware('auth:sanctum')->post('logout', [AuthController::class, 'logout']);
-
-

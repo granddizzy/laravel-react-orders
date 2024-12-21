@@ -9,13 +9,11 @@ use Laravel\Sanctum\Sanctum;
 use TCG\Voyager\Models\Role;
 use Tests\TestCase;
 
-class AuthControllerTest extends TestCase
-{
+class AuthControllerTest extends TestCase {
     use RefreshDatabase;
 
     /** @test */
-    public function testRegister()
-    {
+    public function testRegister() {
         // Регистрируем пользователя через API
         $response = $this->postJson('/api/register', [
             'name' => 'Test User',
@@ -41,8 +39,7 @@ class AuthControllerTest extends TestCase
     }
 
     /** @test */
-    public function user_can_login()
-    {
+    public function user_can_login() {
         $user = User::factory()->create([
             'password' => Hash::make('password123')
         ]);
@@ -61,8 +58,7 @@ class AuthControllerTest extends TestCase
     }
 
     /** @test */
-    public function user_cannot_login_with_invalid_credentials()
-    {
+    public function user_cannot_login_with_invalid_credentials() {
         $user = User::factory()->create([
             'password' => Hash::make('password123')
         ]);
@@ -77,8 +73,7 @@ class AuthControllerTest extends TestCase
     }
 
     /** @test */
-    public function user_can_logout()
-    {
+    public function user_can_logout() {
         $user = User::factory()->create();
         Sanctum::actingAs($user);
 
@@ -91,8 +86,7 @@ class AuthControllerTest extends TestCase
     }
 
     /** @test */
-    public function user_can_update_profile()
-    {
+    public function user_can_update_profile() {
         $user = User::factory()->create([
             'name' => 'Old Name',
             'email' => 'old@example.com',
@@ -117,8 +111,7 @@ class AuthControllerTest extends TestCase
     }
 
     /** @test */
-    public function user_can_get_data()
-    {
+    public function user_can_get_data() {
         $user = User::factory()->create();
         Sanctum::actingAs($user);
 
@@ -136,11 +129,42 @@ class AuthControllerTest extends TestCase
     }
 
     /** @test */
-    public function user_cannot_access_data_if_not_authenticated()
-    {
+    public function user_cannot_access_data_if_not_authenticated() {
         $response = $this->getJson('/api/profile');
 
         $response->assertStatus(401);
         $response->assertJson(['message' => 'Unauthenticated.']);
+    }
+
+    /** @test */
+    public function user_can_be_deleted() {
+        // Создаем пользователя, который будет удалять
+        $admin = User::factory()->create();
+
+        // Создаем роль 'admin' и привязываем к пользователю
+        $adminRole = Role::firstOrCreate(['name' => 'admin', 'display_name' => 'Администратор']);
+        $admin->roles()->attach($adminRole);
+
+        // Генерируем токен для пользователя с ролью admin
+        $token = $admin->createToken('TestToken')->plainTextToken;
+
+        // Создаем пользователя, которого будем удалять
+        $user = User::factory()->create();
+
+        // Отправляем запрос на удаление пользователя с токеном в заголовке авторизации
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->deleteJson("/api/profile/{$user->id}");
+
+        // Проверяем, что ответ содержит сообщение об успешном удалении
+        $response->assertStatus(200);
+        $response->assertJson([
+            'message' => 'Пользователь успешно удален',
+        ]);
+
+        // Убедитесь, что пользователь был удален из базы данных
+        $this->assertDatabaseMissing('users', [
+            'id' => $user->id,
+        ]);
     }
 }
