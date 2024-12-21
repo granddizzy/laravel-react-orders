@@ -5,6 +5,7 @@ namespace Tests\Feature\Api;
 use App\Models\Product;
 use App\Models\User; // Импортируем модель User
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use TCG\Voyager\Models\Role;
 use Tests\TestCase;
 
 class ProductControllerTest extends TestCase
@@ -63,6 +64,11 @@ class ProductControllerTest extends TestCase
 
         // Создаем пользователя и генерируем токен для Sanctum
         $user = User::factory()->create();
+
+        // Создаем роль 'admin' и привязываем к пользователю
+        $adminRole = Role::firstOrCreate(['name' => 'admin', 'display_name' => 'Администратор']);
+        $user->roles()->attach($adminRole);
+
         $token = $user->createToken('Test Token')->plainTextToken;
 
         // Выполняем запрос с токеном
@@ -122,6 +128,11 @@ class ProductControllerTest extends TestCase
 
         // Создаем пользователя и генерируем токен для Sanctum
         $user = User::factory()->create();
+
+        // Создаем роль 'admin' и привязываем к пользователю
+        $adminRole = Role::firstOrCreate(['name' => 'admin', 'display_name' => 'Администратор']);
+        $user->roles()->attach($adminRole);
+
         $token = $user->createToken('Test Token')->plainTextToken;
 
         // Выполняем запрос с токеном
@@ -150,6 +161,11 @@ class ProductControllerTest extends TestCase
 
         // Создаем пользователя и генерируем токен для Sanctum
         $user = User::factory()->create();
+
+        // Создаем роль 'admin' и привязываем к пользователю
+        $adminRole = Role::firstOrCreate(['name' => 'admin', 'display_name' => 'Администратор']);
+        $user->roles()->attach($adminRole);
+
         $token = $user->createToken('Test Token')->plainTextToken;
 
         // Выполняем запрос с токеном

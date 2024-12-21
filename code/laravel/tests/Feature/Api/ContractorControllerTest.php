@@ -5,6 +5,7 @@ namespace Tests\Feature\Api;
 use App\Models\Contractor;
 use App\Models\User; // Импортируем модель User
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use TCG\Voyager\Models\Role;
 use Tests\TestCase;
 
 class ContractorControllerTest extends TestCase
@@ -63,6 +64,11 @@ class ContractorControllerTest extends TestCase
 
         // Создаем пользователя и генерируем токен для Sanctum
         $user = User::factory()->create();
+
+        // Создаем роль 'admin' и привязываем к пользователю
+        $adminRole = Role::firstOrCreate(['name' => 'admin', 'display_name' => 'Администратор']);
+        $user->roles()->attach($adminRole);
+
         $token = $user->createToken('Test Token')->plainTextToken;
 
         // Выполняем запрос с токеном
@@ -122,6 +128,11 @@ class ContractorControllerTest extends TestCase
 
         // Создаем пользователя и генерируем токен для Sanctum
         $user = User::factory()->create();
+
+        // Создаем роль 'admin' и привязываем к пользователю
+        $adminRole = Role::firstOrCreate(['name' => 'admin', 'display_name' => 'Администратор']);
+        $user->roles()->attach($adminRole);
+
         $token = $user->createToken('Test Token')->plainTextToken;
 
         // Выполняем запрос с токеном
@@ -148,19 +159,25 @@ class ContractorControllerTest extends TestCase
         // Создаем контрагента
         $contractor = Contractor::factory()->create();
 
-        // Создаем пользователя и генерируем токен для Sanctum
+        // Создаем пользователя
         $user = User::factory()->create();
+
+        // Создаем роль 'admin' и привязываем к пользователю
+        $adminRole = Role::firstOrCreate(['name' => 'admin', 'display_name' => 'Администратор']);
+        $user->roles()->attach($adminRole);
+
+        // Генерируем токен для пользователя с ролью 'admin'
         $token = $user->createToken('Test Token')->plainTextToken;
 
         // Выполняем запрос с токеном
         $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
+            'Authorization' => 'Bearer ' . $token, // Добавляем токен в заголовок
         ])->deleteJson("/api/contractors/{$contractor->id}");
 
         // Проверяем статус ответа
         $response->assertStatus(200)
             ->assertJsonFragment([
-                'message' => 'Contractor deleted successfully',
+                'message' => 'Contractor deleted successfully', // Сообщение об успешном удалении
             ]);
 
         // Убедимся, что контрагент был удален из базы
