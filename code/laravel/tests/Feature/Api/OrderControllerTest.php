@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use TCG\Voyager\Models\Role;
 use Tests\TestCase;
 
 class OrderControllerTest extends TestCase
@@ -54,6 +55,11 @@ class OrderControllerTest extends TestCase
     public function test_store_creates_new_order()
     {
         $user = User::factory()->create();
+
+        // Создаем роль 'manager' и привязываем к пользователю
+        $managerRole = Role::firstOrCreate(['name' => 'manager', 'display_name' => 'Менеджер']);
+        $user->roles()->attach($managerRole);
+
         $contractor = Contractor::factory()->create();
         $products = Product::factory()->count(3)->create();
 
@@ -123,6 +129,11 @@ class OrderControllerTest extends TestCase
     public function test_update_modifies_existing_order()
     {
         $user = User::factory()->create();
+
+        // Создаем роль 'manager' и привязываем к пользователю
+        $managerRole = Role::firstOrCreate(['name' => 'manager', 'display_name' => 'Менеджер']);
+        $user->roles()->attach($managerRole);
+
         $contractor = Contractor::factory()->create();
         $order = Order::factory()->create();
 
@@ -180,18 +191,29 @@ class OrderControllerTest extends TestCase
      */
     public function test_destroy_deletes_order()
     {
+        // Создаем пользователя
         $user = User::factory()->create();
+
+        // Создаем роль 'admin' и привязываем к пользователю
+        $adminRole = Role::firstOrCreate(['name' => 'admin', 'display_name' => 'Администратор']);
+        $user->roles()->attach($adminRole);
+
+        // Создаем заказ для удаления
         $order = Order::factory()->create();
 
+        // Генерируем токен для пользователя с ролью admin
         $token = $user->createToken('Test Token')->plainTextToken;
 
+        // Отправляем запрос на удаление заказа
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token, // Добавление токена в заголовок
         ])->deleteJson(route('orders.destroy', $order->id));
 
+        // Проверка, что заказ был удален
         $response->assertStatus(200)
             ->assertJson(['message' => 'Order deleted successfully']);
 
+        // Проверка, что заказа больше нет в базе данных
         $this->assertDatabaseMissing('orders', ['id' => $order->id]);
     }
 }
