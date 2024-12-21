@@ -1,0 +1,176 @@
+{
+	"info": {
+		"_postman_id": "69499e10-aa09-4269-a4a8-925712848af0",
+		"name": "Contractor Controller Tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28044610"
+	},
+	"item": [
+		{
+			"name": "Get Contractors List",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "2|TCAWvdUVTFFt59fZWrchntYheoJpkjxCih8HPoF23705d45a",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/contractors?per_page=10&page=1&search=",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"contractors"
+					],
+					"query": [
+						{
+							"key": "per_page",
+							"value": "10"
+						},
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "search",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create New Contractor",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Test Contractor\",\n  \"unp\": \"123456789\",\n  \"contact_person\": \"John Doe\",\n  \"email\": \"test@example.com\",\n  \"phone\": \"+1234567890\",\n  \"address\": \"123 Test St\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/contractors",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"contractors"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Single Contractor",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/contractors/1",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"contractors",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Contractor",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Updated Contractor\",\n  \"email\": \"updated@example.com\",\n  \"phone\": \"+9876543210\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/contractors/1",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"contractors",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Contractor",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/contractors/1",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"contractors",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "mysite.local",
+			"type": "string"
+		}
+	]
+}
