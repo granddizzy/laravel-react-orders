@@ -136,4 +136,33 @@ class AuthController extends Controller {
         // Возвращаем обновленные данные пользователя
         return response()->json($userData);
     }
+
+    public function getUserData(Request $request) {
+        // Получаем текущего аутентифицированного пользователя
+        $user = auth()->user();
+
+        // Если пользователь не аутентифицирован
+        if (!$user) {
+            return response()->json(['error' => 'Пользователь не аутентифицирован'], 401);
+        }
+
+        // Получаем роли пользователя
+        $roles = $user->roles->map(function ($role) {
+            return [
+                'name' => $role->name,
+                'displayName' => $role->display_name,
+            ];
+        });
+
+        // Формируем данные пользователя
+        $userData = [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'roles' => $roles,
+        ];
+
+        // Возвращаем данные пользователя
+        return response()->json($userData);
+    }
 }
