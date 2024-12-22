@@ -55,7 +55,7 @@ function OrdersList({loading}) {
         </Box>)}
 
         {/* Список товаров */}
-        {orders.map((order, index) => (
+        {orders?.map((order, index) => (
           <Box
             key={order.id}
             component={Link}
