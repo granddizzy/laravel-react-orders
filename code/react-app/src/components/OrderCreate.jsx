@@ -279,7 +279,7 @@ function OrderCreate() {
       {/* Таблица с позициями заказа */}
       {isSmallScreen ? (
         // Адаптивная версия для маленьких экранов
-        <Box>
+        <Box data-testid="product-box">
           {order.products.map((item, index) => (
             <Paper key={index} sx={{mb: 2, p: 2}}>
               <Box sx={{display: 'flex', gap: 2, mb: 2}}>
@@ -334,7 +334,7 @@ function OrderCreate() {
         </Box>
       ) : (
         // Обычная версия для больших экранов
-        <TableContainer component={Paper}>
+        <TableContainer data-testid="product-box" component={Paper}>
           <Table>
             <TableBody>
               {order.products.map((item, index) => (

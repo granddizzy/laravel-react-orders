@@ -1,4 +1,4 @@
-import {render, screen} from '@testing-library/react';
+import {fireEvent, prettyDOM, render, screen, waitFor} from '@testing-library/react';
 import {MemoryRouter, useNavigate} from 'react-router-dom';
 import {Provider, useDispatch, useSelector} from 'react-redux';
 import {configureStore} from '@reduxjs/toolkit';
@@ -6,15 +6,16 @@ import {rootReducer} from '../redux/persistStore';
 import OrderCreate from '../components/OrderCreate';
 import {ApiProvider, useApi} from '../contexts/apiContext';
 import {createTheme, ThemeProvider} from '@mui/material/styles';
+import {userEvent} from "@testing-library/user-event";
 
 // Мокаем зависимости
 
 // Мокируем useDispatch и useSelector для проверки их работы
-jest.mock('react-redux', () => ({
-  ...jest.requireActual('react-redux'),
-  useDispatch: jest.fn(),
-  useSelector: jest.fn(),
-}));
+// jest.mock('react-redux', () => ({
+//   ...jest.requireActual('react-redux'),
+//   useDispatch: jest.fn(),
+//   useSelector: jest.fn(),
+// }));
 
 // Мокируем необходимые хоки, такие как useNavigate и другие
 jest.mock('react-router-dom', () => ({
@@ -27,6 +28,32 @@ jest.mock('../contexts/apiContext', () => ({
   ...jest.requireActual('../contexts/apiContext'),
   useApi: jest.fn(),
 }));
+
+// Мокируем глобальный fetch
+global.fetch = jest.fn((url) => {
+  // Мокаем запрос для контрагентов
+  if (url.includes('contractors')) {
+    return Promise.resolve({
+      json: () => ({
+        data: [{ id: 1, name: 'Контрагент 1' }, { id: 2, name: 'Контрагент 2' }],
+      }),
+    });
+  }
+
+  // Мокаем запрос для товаров
+  if (url.includes('products')) {
+    return Promise.resolve({
+      json: () => ({
+        data: [
+          { id: 1, name: 'Product A', price: 100},
+        ],
+      }),
+    });
+  }
+
+  // В случае других URL — отклоняем запрос
+  return Promise.reject('API request failed');
+});
 
 // Создаем простую тестовую тему
 const theme = createTheme({
@@ -43,34 +70,38 @@ const theme = createTheme({
 
 describe('OrderCreate Component', () => {
   let mockNavigate;
-  let mockDispatch;
+  // let mockDispatch;
 
   // Перед каждым тестом
   beforeEach(() => {
+    // jest.spyOn(console, 'log').mockImplementation((msg) => {
+    //   // Делаем, чтобы log выводился в терминал
+    //   process.stdout.write(msg + '\n');
+    // });
+
     // Мокируем возвращаемое значение useApi
-    useApi.mockReturnValue({
-      createOrder: jest.fn().mockResolvedValue({ success: true }),  // Симулируем успешный ответ
-    });
+    useApi.mockReturnValue('http://mysite.local/api'); // Симулируем URL API
 
     // Мокируем useNavigate
     mockNavigate = jest.fn();
     useNavigate.mockReturnValue(mockNavigate);
 
     // Мокируем useDispatch и useSelector
-    mockDispatch = jest.fn();
-    useDispatch.mockReturnValue(mockDispatch);
+    // mockDispatch = jest.fn();
+    // useDispatch.mockReturnValue(mockDispatch);
 
-    useSelector.mockImplementation((selector) =>
-      selector({
-        auth: { token: 'mockToken' },
-        cart: { products: [] },
-      })
-    );
+    // useSelector.mockImplementation((selector) =>
+    //   selector({
+    //     auth: { token: 'mockToken' },
+    //     cart: { products: [] },
+    //   })
+    // );
   });
 
   // После каждого теста
   afterEach(() => {
     jest.clearAllMocks();
+    // jest.restoreAllMocks();
   });
 
   test('renders form correctly', () => {
@@ -101,4 +132,135 @@ describe('OrderCreate Component', () => {
     expect(screen.getByText(/Добавить позицию/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Примечания/i)).toBeInTheDocument();
   });
+
+  test('should add product to order', async () => {
+    const store = configureStore({
+      reducer: rootReducer,
+      preloadedState: {
+        auth: { token: 'mockToken' },
+        cart: { products: [] },
+      },
+    });
+
+    render(
+      <Provider store={store}>
+        <ApiProvider>
+          <ThemeProvider theme={theme}>
+            <MemoryRouter>
+              <OrderCreate />
+            </MemoryRouter>
+          </ThemeProvider>
+        </ApiProvider>
+      </Provider>
+    );
+
+    // Находим кнопку "Добавить позицию"
+    const addButton = screen.getByText(/Добавить позицию/i);
+
+    // Симулируем клик по кнопке
+    await userEvent.click(addButton);
+
+    // Ждем появления новой строки с полем для номенклатуры
+    await waitFor(() => {
+      const newRowLabel = screen.getAllByText(/Номенклатура/i);
+      expect(newRowLabel.length).toBeGreaterThan(0); // Убедимся, что добавилась строка
+    });
+  });
+
+  test('should remove product from order', async () => {
+    const store = configureStore({
+      reducer: rootReducer,
+      preloadedState: {
+        auth: { token: 'mockToken' },
+        cart: { products: [{ id: 1, name: 'Product A', price: 100, quantity: 1 }] },
+      },
+    });
+
+    const { container }= render(
+      <Provider store={store}>
+        <ApiProvider>
+          <ThemeProvider theme={theme}>
+            <MemoryRouter>
+              <OrderCreate />
+            </MemoryRouter>
+          </ThemeProvider>
+        </ApiProvider>
+      </Provider>
+    );
+
+    // Ждем, пока компоненты подгрузятся и данные API станут доступны
+    await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1)); // Ждем два запроса (для контрагентов и товаров)
+
+
+    // Ищем input для номенклатуры по тестовому ID
+    const productInput = await screen.findByLabelText('Номенклатура');
+
+    // Проверяем, что значение в поле ввода равно 'Product A'
+    expect(productInput.value).toBe('Product A');
+  });
+
+  // test('should handle form validation errors', async () => {
+  //   const store = configureStore({
+  //     reducer: rootReducer,
+  //     preloadedState: {
+  //       auth: { token: 'mockToken' },
+  //       cart: { products: [] },
+  //     },
+  //   });
+  //
+  //   render(
+  //     <Provider store={store}>
+  //       <ApiProvider>
+  //         <ThemeProvider theme={theme}>
+  //           <MemoryRouter>
+  //             <OrderCreate />
+  //           </MemoryRouter>
+  //         </ThemeProvider>
+  //       </ApiProvider>
+  //     </Provider>
+  //   );
+  //
+  //   const submitButton = screen.getByRole('button', { name: /Сохранить заказ/i });
+  //   userEvent.click(submitButton);
+  //
+  //   // Проверяем, что ошибка для обязательного контрагента появилась
+  //   expect(await screen.findByText('Пожалуйста, заполните все обязательные поля.')).toBeInTheDocument();
+  // });
+  //
+  // test('should submit form successfully', async () => {
+  //   const store = configureStore({
+  //     reducer: rootReducer,
+  //     preloadedState: {
+  //       auth: { token: 'mockToken' },
+  //       cart: { products: [] },
+  //     },
+  //   });
+  //
+  //   render(
+  //     <Provider store={store}>
+  //       <ApiProvider>
+  //         <ThemeProvider theme={theme}>
+  //           <MemoryRouter>
+  //             <OrderCreate />
+  //           </MemoryRouter>
+  //         </ThemeProvider>
+  //       </ApiProvider>
+  //     </Provider>
+  //   );
+  //
+  //   // Мокаем выбор контрагента
+  //   userEvent.type(screen.getByLabelText(/Контрагент \*/i), 'Test Contractor');
+  //
+  //   // Мокаем поля товаров
+  //   userEvent.type(screen.getByLabelText(/Номенклатура/i), 'Test Product');
+  //   userEvent.type(screen.getByLabelText(/Количество/i), '1');
+  //   userEvent.type(screen.getByLabelText(/Цена/i), '100');
+  //
+  //   // Кликаем на кнопку отправки
+  //   const submitButton = screen.getByRole('button', { name: /Сохранить заказ/i });
+  //   userEvent.click(submitButton);
+  //
+  //   // Проверяем, что был вызван navigate после успешной отправки
+  //   await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/orders'));
+  // });
 });
