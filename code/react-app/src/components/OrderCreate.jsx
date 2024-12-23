@@ -238,6 +238,7 @@ function OrderCreate() {
 
       {/* Автозаполнение контрагента */}
       <Autocomplete
+        data-testid="contractor-box"
         options={contractorOptions}
         getOptionLabel={(option) => option.name}
         onInputChange={handleContractorSearch}
