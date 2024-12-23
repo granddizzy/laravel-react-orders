@@ -23,7 +23,7 @@ class AdminSeeder extends Seeder {
 
         // Проверяем, существует ли роль, и назначаем её пользователю
         if ($adminRole) {
-            $user->assignRole($adminRole);  // Назначаем роль
+            $user->roles()->attach($adminRole->id); // Назначаем роль
         } else {
             // Если роль не существует, выводим ошибку или создаем роль
             $this->command->error('Роль "admin" не найдена!');
