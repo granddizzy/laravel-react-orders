@@ -1,6 +1,6 @@
 // src/Orders.jsx
-import React, {useEffect} from 'react';
-import {Typography, Box, Button, InputLabel, Select, MenuItem, FormControl} from '@mui/material';
+import React, {useEffect, useState} from 'react';
+import {Typography, Box, Button, InputLabel, Select, MenuItem, FormControl, Snackbar} from '@mui/material';
 import {useDispatch, useSelector} from "react-redux";
 import {useApi} from "../contexts/apiContext";
 import {Link} from "react-router-dom";
@@ -10,8 +10,10 @@ import OrdersList from "./OrdersList";
 
 function Orders() {
   const dispatch = useDispatch();
-  const {loading, currentPage, pageSize, search} = useSelector((state) => state.orders);
+  const {loading, currentPage, pageSize, search, error} = useSelector((state) => state.orders);
   const token = useSelector((state) => state.auth.token);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
   const generateQueryParams = () => {
     const params = new URLSearchParams();
     const page = typeof currentPage === 'number' && !isNaN(currentPage) ? currentPage : 1;
@@ -28,11 +30,20 @@ function Orders() {
     dispatch(fetchOrders({
       url: `${apiUrl}/orders?${queryParams}`,
       token: token,
-    }));
-  }, [dispatch, currentPage, pageSize, search]);
+    })).catch((err) => {
+      // Если запрос не удался, показываем ошибку
+      const errorMessage = err?.response?.data?.message || 'Произошла ошибка при загрузке заказов';
+      setSnackbarMessage(errorMessage);
+      setOpenSnackbar(true);
+    });
+  }, [dispatch, currentPage, pageSize, search, apiUrl, token]);
 
   const handlePageSizeChange = (event) => {
     dispatch(setPageSize(event.target.value)); // Изменяем размер страницы
+  };
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
   };
 
   return (
@@ -77,6 +88,14 @@ function Orders() {
 
       <OrdersSearch/>
       <OrdersList loading={loading}/>
+
+      {/* Snackbar для ошибок */}
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        message={snackbarMessage}
+      />
     </Box>
   );
 }

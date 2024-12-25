@@ -1,23 +1,15 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
   Typography,
   Box,
   Button,
-  CardContent,
-  CardMedia,
-  Grid2,
-  Card,
-  TableCell,
-  TableHead,
-  TableRow, TableBody, TableContainer, Table, Paper, MenuItem, TextField
+  MenuItem, TextField
 } from '@mui/material';
-import {useDispatch, useSelector} from "react-redux";
-import {fetchProducts} from "../redux/productsSlice";
+import {useSelector} from "react-redux";
 import {useApi} from "../contexts/apiContext";
-import {Link, useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 
 function ProductCreate() {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const apiUrl = useApi();
   const [isLoading, setIsLoading] = useState(false);
@@ -167,7 +159,7 @@ function ProductCreate() {
       )}
 
       {/* Кнопки отправки и отмены */}
-      <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+      <Box sx={{display: 'flex', gap: 2, justifyContent: 'flex-end'}}>
         <Button
           type="button"
           variant="outlined"
