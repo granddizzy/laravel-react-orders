@@ -78,11 +78,6 @@ class OrderController extends Controller {
         // Получаем текущего аутентифицированного пользователя
         $user = auth()->user();
 
-        // Проверяем, имеет ли пользователь роль 'admin' или 'manager'
-        if (!$user->hasRole('admin') && !$user->hasRole('manager')) {
-            return response()->json(['error' => 'У вас нет прав для создания заказа'], 403); // Возвращаем ошибку, если пользователь не администратор
-        }
-
         // Валидируем данные запроса
         $validated = $request->validate([
             'shipping_address' => 'nullable|string',
@@ -177,11 +172,6 @@ class OrderController extends Controller {
         // Получаем текущего аутентифицированного пользователя
         $user = auth()->user();
 
-        // Проверяем, имеет ли пользователь роль 'admin' или 'manager'
-        if (!$user->hasRole('admin') && !$user->hasRole('manager')) {
-            return response()->json(['error' => 'У вас нет прав для обновления заказа'], 403); // Возвращаем ошибку, если пользователь не администратор
-        }
-
         // Находим заказ по ID
         $order = Order::findOrFail($id);
 
@@ -249,11 +239,6 @@ class OrderController extends Controller {
     public function destroy(string $id) {
         // Получаем текущего аутентифицированного пользователя
         $user = auth()->user();
-
-        // Проверяем, имеет ли пользователь роль 'admin'
-        if (!$user || !$user->hasRole('admin')) {
-            return response()->json(['error' => 'У вас нет прав для удаления заказа'], 403); // Возвращаем ошибку, если пользователь не администратор
-        }
 
         // Находим заказ по ID
         $order = Order::find($id);

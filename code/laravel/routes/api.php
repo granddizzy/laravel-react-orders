@@ -29,12 +29,21 @@ Route::middleware('auth:sanctum')->group(function () {
     // Ресурсные маршруты для сущностей
     Route::apiResource('contractors', ContractorController::class); // контрагенты
     Route::apiResource('products', ProductController::class);          // Продукты (номенклатура)
-    Route::apiResource('orders', OrderController::class);              // Заказы
 
     // Дополнительные маршруты
     Route::get('orders/{order}/products', [OrderController::class, 'getProducts']); // Продукты в заказе
     Route::post('orders/{order}/add-product', [OrderController::class, 'addProduct']); // Добавление товара в заказ
     Route::get('contractors/{contractor}/orders', [ContractorController::class, 'getOrders']); // Заказы контрагента
+
+    Route::middleware(['role:admin|manager'])->group(function () {
+        Route::post('/orders', [OrderController::class, 'store']);
+        Route::put('/orders/{id}', [OrderController::class, 'update']);
+    });
+
+    Route::middleware(['role:admin'])->group(function () {
+        Route::delete('/orders/{id}', [OrderController::class, 'destroy']);
+    });
+
 });
 
 // Маршруты для аутентификации
