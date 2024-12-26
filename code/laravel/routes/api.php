@@ -35,6 +35,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('orders/{order}/add-product', [OrderController::class, 'addProduct']); // Добавление товара в заказ
     Route::get('contractors/{contractor}/orders', [ContractorController::class, 'getOrders']); // Заказы контрагента
 
+    Route::get('/orders', [OrderController::class, 'index']);
     Route::middleware(['role:admin|manager'])->group(function () {
         Route::post('/orders', [OrderController::class, 'store']);
         Route::put('/orders/{id}', [OrderController::class, 'update']);
