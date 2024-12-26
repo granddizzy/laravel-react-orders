@@ -144,7 +144,7 @@ return [
         ],
 
         'widgets' => [
-
+            \App\Widgets\OrderCountWidget::class,
         ],
 
     ],
@@ -255,4 +255,6 @@ return [
            ],
        ]*/
     ],
+
+    'middleware' => ['web', 'auth', 'admin'],
 ];
