@@ -24,6 +24,8 @@ function ProductView() {
   const cartProducts = useSelector((state) => state.cart.products);
   const token = useSelector((state) => state.auth.token);
 
+  const user = useSelector((state) => state.auth.user);
+
   const dispatch = useDispatch();
 
   // Проверка: есть ли продукт в корзине
@@ -75,7 +77,9 @@ function ProductView() {
   if (error) {
     return <Typography color="error">{`${error}`}</Typography>;
   }
-  console.log(product)
+
+  const hasRole = (role) => user?.roles?.some(r => r.name === role);
+
   return (
     <Box
       sx={{
@@ -151,14 +155,16 @@ function ProductView() {
         </Box>
 
         {/* Кнопка "Редактировать" на всю ширину */}
-        <Button
-          variant="contained"
-          color="primary"
-          fullWidth
-          onClick={() => navigate(`/products/${productId}/edit`)}
-        >
-          Редактировать
-        </Button>
+        {hasRole('manager') || hasRole('admin') ? (
+          <Button
+            variant="contained"
+            color="primary"
+            fullWidth
+            onClick={() => navigate(`/products/${productId}/edit`)}
+          >
+            Редактировать
+          </Button>
+        ) : null}
       </Box>
 
     </Box>

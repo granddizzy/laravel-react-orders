@@ -25,6 +25,7 @@ function Contractors() {
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const user = useSelector((state) => state.auth.user);
 
   const generateQueryParams = () => {
     const params = new URLSearchParams();
@@ -49,6 +50,8 @@ function Contractors() {
     dispatch(setPageSize(event.target.value)); // Изменяем размер страницы
   };
 
+  const hasRole = (role) => user?.roles?.some(r => r.name === role);
+
   return (
     <Box sx={{flexGrow: 1}}>
       <Typography variant="h4" gutterBottom>
@@ -60,14 +63,16 @@ function Contractors() {
 
       {/* Кнопка и выпадающий список */}
       <Box sx={{display: 'flex', justifyContent: 'space-between', mb: 2}}>
-        <Button
-          variant="contained"
-          color="primary"
-          component={Link}
-          to="/contractors/create"
-        >
-          Добавить контрагента
-        </Button>
+        { (hasRole('admin')) && (
+          <Button
+            variant="contained"
+            color="primary"
+            component={Link}
+            to="/contractors/create"
+          >
+            Добавить
+          </Button>
+        )}
 
         <FormControl sx={{minWidth: 120}}>
           <InputLabel id="page-size-label">На странице</InputLabel>

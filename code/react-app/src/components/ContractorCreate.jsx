@@ -1,23 +1,15 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
   Typography,
   Box,
   Button,
-  CardContent,
-  CardMedia,
-  Grid2,
-  Card,
-  TableCell,
-  TableHead,
-  TableRow, TableBody, TableContainer, Table, Paper, MenuItem, TextField
+TextField
 } from '@mui/material';
-import {useDispatch, useSelector} from "react-redux";
-import {fetchProducts} from "../redux/productsSlice";
+import {useSelector} from "react-redux";
 import {useApi} from "../contexts/apiContext";
-import {Link, useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 
 function ContractorCreate() {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const apiUrl = useApi();
   const [isLoading, setIsLoading] = useState(false);
@@ -96,7 +88,7 @@ function ContractorCreate() {
       }}
     >
       <Typography variant="h5" gutterBottom>
-        Создать нового контрагента
+        Создать контрагента
       </Typography>
 
       {/* Поля формы */}
@@ -155,9 +147,24 @@ function ContractorCreate() {
       )}
 
       {/* Кнопка отправки */}
-      <Button type="submit" variant="contained" color="primary" disabled={isLoading}>
-        {isLoading ? 'Создание...' : 'Создать контрагента'}
-      </Button>
+      <Box sx={{ display: 'flex', gap: 2, justifyContent: 'space-between', width: '100%' }}>
+        <Button
+          type="button"
+          variant="outlined"
+          color="secondary"
+          onClick={() => navigate(-1)}
+        >
+          Отмена
+        </Button>
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          disabled={isLoading}
+        >
+          {isLoading ? 'Создание...' : 'Создать'}
+        </Button>
+      </Box>
     </Box>
   );
 }

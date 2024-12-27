@@ -22,6 +22,8 @@ function ContractorView() {
 
   const token = useSelector((state) => state.auth.token);
 
+  const user = useSelector((state) => state.auth.user);
+
   // Функция для загрузки данных о продукте
   useEffect(() => {
     const fetchContractor = async () => {
@@ -59,6 +61,8 @@ function ContractorView() {
   if (error) {
     return <Typography color="error">{`${error}`}</Typography>;
   }
+
+  const hasRole = (role) => user?.roles?.some(r => r.name === role);
 
   return (
     <Box
@@ -118,13 +122,16 @@ function ContractorView() {
         >
           Назад
         </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleEdit}
-        >
-          Редактировать
-        </Button>
+
+        {(hasRole('manager') || hasRole('admin')) && (
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleEdit}
+          >
+            Редактировать
+          </Button>
+        )}
       </Box>
     </Box>
   );

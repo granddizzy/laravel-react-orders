@@ -14,6 +14,7 @@ function Orders() {
   const token = useSelector((state) => state.auth.token);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const user = useSelector((state) => state.auth.user);
   const generateQueryParams = () => {
     const params = new URLSearchParams();
     const page = typeof currentPage === 'number' && !isNaN(currentPage) ? currentPage : 1;
@@ -48,6 +49,8 @@ function Orders() {
     setOpenSnackbar(false);
   };
 
+  const hasRole = (role) => user?.roles?.some(r => r.name === role);
+
   return (
     <Box sx={{flexGrow: 1}}>
       <Typography variant="h4" gutterBottom>
@@ -59,14 +62,16 @@ function Orders() {
 
       {/* Кнопка и выпадающий список */}
       <Box sx={{display: 'flex', justifyContent: 'space-between', mb: 2}}>
-        <Button
-          variant="contained"
-          color="primary"
-          component={Link}
-          to="/orders/create"
-        >
-          Создать заказ
-        </Button>
+        {(hasRole('manager') || hasRole('admin')) && (
+          <Button
+            variant="contained"
+            color="primary"
+            component={Link}
+            to="/orders/create"
+          >
+            Создать
+          </Button>
+        )}
 
         <FormControl sx={{minWidth: 120}}>
           <InputLabel id="page-size-label">На странице</InputLabel>

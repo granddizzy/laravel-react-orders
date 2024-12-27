@@ -88,7 +88,7 @@ function ProductCreate() {
       }}
     >
       <Typography variant="h5" gutterBottom>
-        Создать новый продукт
+        Создать продукт
       </Typography>
 
       {/* Поля формы */}
@@ -159,7 +159,7 @@ function ProductCreate() {
       )}
 
       {/* Кнопки отправки и отмены */}
-      <Box sx={{display: 'flex', gap: 2, justifyContent: 'flex-end'}}>
+      <Box sx={{ display: 'flex', gap: 2, justifyContent: 'space-between', width: '100%' }}>
         <Button
           type="button"
           variant="outlined"
@@ -174,7 +174,7 @@ function ProductCreate() {
           color="primary"
           disabled={isLoading}
         >
-          {isLoading ? 'Создание...' : 'Создать продукт'}
+          {isLoading ? 'Создание...' : 'Создать'}
         </Button>
       </Box>
     </Box>

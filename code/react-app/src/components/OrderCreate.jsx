@@ -233,7 +233,7 @@ function OrderCreate() {
       }}
     >
       <Typography variant="h5" gutterBottom>
-        Создать новый заказ
+        Создать заказ
       </Typography>
 
       {/* Автозаполнение контрагента */}
@@ -411,13 +411,24 @@ function OrderCreate() {
 
       {/* Сообщения об ошибке или загрузке */}
       {error && <Typography color="error">{error}</Typography>}
-      <Button
-        type="submit"
-        variant="contained"
-        disabled={isLoading} // Заблокировать кнопку при загрузке
-      >
-        {isLoading ? 'Сохранение' : 'Сохранить заказ'}
-      </Button>
+      <Box sx={{ display: 'flex', gap: 2, justifyContent: 'space-between', width: '100%' }}>
+        <Button
+          type="button"
+          variant="outlined"
+          color="secondary"
+          onClick={() => navigate(-1)}
+        >
+          Отмена
+        </Button>
+        <Button
+          type="submit"
+          variant="contained"
+          disabled={isLoading}
+        >
+          {isLoading ? 'Создание' : 'Создать'}
+        </Button>
+      </Box>
+
     </Box>
   );
 }

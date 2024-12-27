@@ -7,11 +7,15 @@ import {
 } from '@mui/material';
 import {Link} from "react-router-dom";
 import ProductsList from "./ProductsList";
-import ProductsSearch from "./ProductsSearch"; // Импортируем debounce
+import ProductsSearch from "./ProductsSearch";
+import {useSelector} from "react-redux"; // Импортируем debounce
 
 function Products() {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('md')); // Проверка на маленький экран
+  const user = useSelector((state) => state.auth.user);
+
+  const hasRole = (role) => user?.roles?.some(r => r.name === role);
 
   return (
     <Box sx={{flexGrow: 1}}>
@@ -23,15 +27,17 @@ function Products() {
       </Typography>
 
       {/* Кнопка и выпадающий список */}
-      <Box sx={{display: 'flex', justifyContent: 'space-between', mb: 2}}>
-        <Button
-          variant="contained"
-          color="primary"
-          component={Link}
-          to="/products/create"
-        >
-          Добавить продукт
-        </Button>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+        {(hasRole('admin')) && (
+          <Button
+            variant="contained"
+            color="primary"
+            component={Link}
+            to="/products/create"
+          >
+            Добавить
+          </Button>
+        )}
       </Box>
 
       <ProductsSearch/>
