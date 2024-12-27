@@ -180,7 +180,7 @@ function ContractorEdit() {
           color="primary"
           disabled={isLoading}
         >
-          {isLoading ? 'Обновление...' : 'Обновить продукт'}
+          {isLoading ? 'Загрузка...' : 'Сохранить'}
         </Button>
         <Button
           variant="outlined"
