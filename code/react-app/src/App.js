@@ -16,7 +16,7 @@ import ProductCreate from "./components/ProductCreate";
 import ContractorCreate from "./components/ContractorCreate";
 import OrderCreate from "./components/OrderCreate";
 import Login from "./components/Login";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import Registration from "./components/Registration";
 import Profile from "./components/Profile";
 import ProductEdit from "./components/ProductEdit";
@@ -26,6 +26,8 @@ import ContractorEdit from "./components/ContractorEdit";
 import OrderEdit from "./components/OrderEdit";
 import Order from "./components/Order";
 import OrderCart from "./components/OrderCart";
+import {useEffect} from "react";
+import {logout} from "./redux/authSlice";
 
 const baseUrl = "";
 // const baseUrl = "/orders-app";
@@ -34,6 +36,23 @@ function App() {
   const isDesktop = useMediaQuery((theme) => theme.breakpoints.up('sm')); // Определяем десктоп
 
   const auth = useSelector((state) => state.auth);
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const handleLogout = () => {
+      dispatch(logout());  // Выполняем логаут
+      window.location.href = '/login';  // Перенаправляем на страницу логина
+    };
+
+    // Подписываемся на событие логаута
+    window.addEventListener('logout', handleLogout);
+
+    // Очистка подписки при размонтировании компонента
+    return () => {
+      window.removeEventListener('logout', handleLogout);
+    };
+  }, [dispatch]);
 
   return (
     <Router basename={baseUrl}>

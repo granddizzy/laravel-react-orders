@@ -1,5 +1,5 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
-import axios from 'axios';
+import apiClient from '../api/axiosInstance';
 
 export const fetchOrders = createAsyncThunk(
   'orders/fetchOrders',
@@ -7,7 +7,8 @@ export const fetchOrders = createAsyncThunk(
     try {
       // Формируем заголовки с токеном
       const headers = token ? {Authorization: `Bearer ${token}`} : {};
-      const response = await axios.get(url, {headers});
+      const response = await apiClient.get(url, {headers});
+      console.log(response.status)
       if (response.status !== 200) {
         throw new Error(`Error: ${response.statusText}`);
       }

@@ -30,12 +30,14 @@ function Orders() {
     dispatch(fetchOrders({
       url: `${apiUrl}/orders?${queryParams}`,
       token: token,
-    })).catch((err) => {
-      // Если запрос не удался, показываем ошибку
-      const errorMessage = err?.response?.data?.message || 'Произошла ошибка при загрузке заказов';
-      setSnackbarMessage(errorMessage);
-      setOpenSnackbar(true);
-    });
+    }))
+      .unwrap() // Разворачиваем промис для обработки результата или ошибки
+      .catch((err) => {
+        // Если запрос не удался, показываем ошибку
+        const errorMessage = err?.message || 'Произошла ошибка при загрузке заказов';
+        setSnackbarMessage(errorMessage);
+        setOpenSnackbar(true);
+      });
   }, [dispatch, currentPage, pageSize, search, apiUrl, token]);
 
   const handlePageSizeChange = (event) => {
