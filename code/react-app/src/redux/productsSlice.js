@@ -1,5 +1,5 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
-import axios from 'axios';
+import apiClient from '../api/axiosInstance';
 
 // Асинхронное действие для подгрузки следующих данных (вниз)
 export const fetchMoreProducts = createAsyncThunk(
@@ -18,7 +18,7 @@ export const fetchMoreProducts = createAsyncThunk(
       const url = `${apiUrl}/products?${params.toString()}`;
 
       const headers = token ? {Authorization: `Bearer ${token}`} : {};
-      const response = await axios.get(url, {
+      const response = await apiClient.get(url, {
         headers,
       });
       if (response.status !== 200) {
@@ -49,7 +49,7 @@ export const fetchPreviousProducts = createAsyncThunk(
       //   throw new Error('No more previous pages');
       // }
       const headers = token ? {Authorization: `Bearer ${token}`} : {};
-      const response = await axios.get(url, {
+      const response = await apiClient.get(url, {
         headers,
       });
       if (response.status !== 200) {
