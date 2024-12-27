@@ -13,11 +13,12 @@ class RoleMiddleware
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
-     * @param  string|array  $roles
+     * @param array|string $roles
      * @return mixed
      */
-    public function handle(Request $request, Closure $next, ...$roles)
+    public function handle(Request $request, Closure $next, string $roles)
     {
+        $roles = explode('|', $roles);
 
         // Проверяем наличие одной из указанных ролей
         if (!$request->user()->hasAnyRole($roles)) {
