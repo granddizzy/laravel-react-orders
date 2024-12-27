@@ -155,7 +155,7 @@ function ProductView() {
         </Box>
 
         {/* Кнопка "Редактировать" на всю ширину */}
-        {hasRole('manager') || hasRole('admin') ? (
+        {hasRole('admin') ? (
           <Button
             variant="contained"
             color="primary"

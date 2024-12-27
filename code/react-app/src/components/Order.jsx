@@ -23,6 +23,8 @@ function OrderView() {
 
   const token = useSelector((state) => state.auth.token);
 
+  const user = useSelector((state) => state.auth.user);
+
   // Функция для получения статуса на русском
   const getStatusInRussian = (status) => {
     return statusMap[status] || status; // Если статус не найден, выводим исходный
@@ -43,7 +45,6 @@ function OrderView() {
         }
         const data = await response.json();
         setOrder(data); // Заполняем данные о заказе
-        console.log(data)
       } catch (err) {
         setError(err.message);
       } finally {
@@ -53,6 +54,8 @@ function OrderView() {
 
     fetchOrder();
   }, [apiUrl, orderId, token]);
+
+  const hasRole = (role) => user?.roles?.some(r => r.name === role);
 
   if (isLoading) {
     return <CircularProgress />;
@@ -130,6 +133,7 @@ function OrderView() {
         >
           Назад
         </Button>
+        {hasRole('admin') ? (
         <Button
           variant="contained"
           color="primary"
@@ -137,6 +141,7 @@ function OrderView() {
         >
           Редактировать
         </Button>
+        ) : null}
       </Box>
     </Box>
   );

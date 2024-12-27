@@ -123,7 +123,7 @@ function ContractorView() {
           Назад
         </Button>
 
-        {(hasRole('manager') || hasRole('admin')) && (
+        {(hasRole('admin')) && (
           <Button
             variant="contained"
             color="primary"
