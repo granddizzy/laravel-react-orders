@@ -24,8 +24,17 @@ class ContractorController extends Controller {
         $page = $validated['page'] ?? 1;
         $search = $validated['search'] ?? null;
 
-        // Строим запрос
-        $query = Contractor::query();
+        // Получаем аутентифицированного пользователя
+        $user = auth()->user();
+
+        // Строим запрос для контрагентов, в зависимости от роли пользователя
+        if ($user->hasAnyRole(['admin'])) {
+            // Если пользователь администратор, то возвращаем всех контрагентов
+            $query = Contractor::query();
+        } else {
+            // Если пользователь не администратор, возвращаем только привязанные контрагенты
+            $query = $user->contractors();
+        }
 
         // Если есть строка для поиска, добавляем фильтрацию
         if ($search) {
@@ -38,6 +47,8 @@ class ContractorController extends Controller {
                 ->orWhere('phone', 'like', '%' . $search . '%'); // Пример: поиск по телефону
             });
         }
+
+        $query->orderBy('name', 'asc');
 
         // Применяем пагинацию
         $contractors = $query->paginate($perPage, ['*'], 'page', $page);

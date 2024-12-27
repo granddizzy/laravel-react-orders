@@ -26,11 +26,25 @@ class OrderController extends Controller {
         $page = $validated['page'] ?? 1;
         $search = $validated['search'] ?? null;
 
+        // Получаем аутентифицированного пользователя
+        $user = auth()->user();
+
         // Начинаем построение запроса
         $query = Order::query();
 
         // Подгружаем связанные данные
         $query->with(['contractor', 'products']);
+
+        if (!$user->hasAnyRole(['admin'])) {
+            // Получаем список контрагентов пользователя
+            $contractorIds = $user->contractors()->pluck('contractor_id');
+            // Фильтрация заказов, по контранту пользователя
+            if ($contractorIds->isNotEmpty()) {
+                $query->whereHas('contractor', function ($query) use ($contractorIds) {
+                    $query->whereIn('contractor_id', $contractorIds); // Фильтруем по контрагентам
+                });
+            }
+        }
 
         // Фильтрация по строке поиска, если она задана
         if ($search) {
@@ -48,6 +62,8 @@ class OrderController extends Controller {
                     });
             });
         }
+
+        $query->orderBy('created_at', 'desc');
 
         // Применяем пагинацию
         $orders = $query->paginate($perPage, ['*'], 'page', $page);

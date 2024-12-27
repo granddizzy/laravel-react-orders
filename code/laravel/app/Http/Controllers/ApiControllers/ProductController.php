@@ -36,6 +36,8 @@ class ProductController extends Controller {
             });
         }
 
+        $query->orderBy('name', 'asc');
+
         // Применяем пагинацию
         $products = $query->paginate($perPage, ['*'], 'page', $page);
 
