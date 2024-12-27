@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {useDispatch} from 'react-redux';
 import {login} from '../redux/authSlice'; // Импортируем экшен login
 import axios from 'axios';
+import apiClient from '../api/axiosInstance'
 import {
   TextField,
   Button,
@@ -41,26 +42,50 @@ const Register = () => {
     setIsLoading(true); // Устанавливаем состояние загрузки
 
     try {
-      const response = await axios.post(`${baseUrl}/register`, formData);
+      // Регистрация пользователя
+      const response = await apiClient.post(`${baseUrl}/register`, formData);
 
-      const loginResponse = await axios.post(`${baseUrl}/login`, {
+      // Логин после успешной регистрации
+      const loginResponse = await apiClient.post(`${baseUrl}/login`, {
         email: formData.email,
         password: formData.password,
       });
 
-      const token = loginResponse.data.token;
+      const { token, user } = loginResponse.data;
 
-      // Сохранение токена
-      dispatch(login({token, user: loginResponse.data.user}));
+      if (!token || !user) {
+        throw new Error('Некорректный ответ от сервера при авторизации');
+      }
 
+      dispatch(login({ token, user }));
       setError(null);
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || 'Произошла ошибка при регистрации');
+      console.error('Ошибка при регистрации или авторизации:', err);
+
+      if (err.response) {
+        const errorData = err.response.data?.error;
+
+        // Проверяем, есть ли вложенные сообщения об ошибке
+        if (errorData && typeof errorData === 'object') {
+          const errorMessages = Object.values(errorData)
+            .flat() // Преобразуем вложенные массивы в один массив
+            .join(', '); // Соединяем все сообщения в строку
+          setError(errorMessages);
+        } else {
+          setError(err.response.data?.message || 'Произошла ошибка на сервере');
+        }
+      } else if (err.request) {
+        setError('Ошибка соединения с сервером. Проверьте подключение к интернету.');
+      } else {
+        setError(err.message || 'Произошла неизвестная ошибка');
+      }
     } finally {
       setIsLoading(false); // Завершаем состояние загрузки
     }
   };
+
+
 
   return (
     <Container maxWidth="xs" sx={{mt: 5}}>
