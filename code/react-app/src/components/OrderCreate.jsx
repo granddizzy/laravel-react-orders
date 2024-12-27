@@ -396,8 +396,8 @@ function OrderCreate() {
       )}
 
       {/* Кнопка добавления позиции */}
-      <Button onClick={handleAddItem} variant="contained">
-        Добавить позицию
+      <Button onClick={handleAddItem} variant="outlined">
+        Добавить строку
       </Button>
 
       {/* Поле ввода примечаний */}
@@ -420,14 +420,18 @@ function OrderCreate() {
         >
           Отмена
         </Button>
-        <Button
-          type="submit"
-          variant="contained"
-          disabled={isLoading}
-        >
-          {isLoading ? 'Создание' : 'Создать'}
-        </Button>
+        <Box sx={{ flexGrow: 1 }}>
+          <Button
+            type="submit"
+            variant="contained"
+            fullWidth
+            disabled={isLoading}
+          >
+            {isLoading ? 'Создание' : 'Создать'}
+          </Button>
+        </Box>
       </Box>
+
 
     </Box>
   );

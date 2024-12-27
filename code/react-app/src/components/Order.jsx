@@ -58,7 +58,7 @@ function OrderView() {
   const hasRole = (role) => user?.roles?.some(r => r.name === role);
 
   if (isLoading) {
-    return <CircularProgress />;
+    return <CircularProgress/>;
   }
 
   if (error) {
@@ -134,13 +134,16 @@ function OrderView() {
           Назад
         </Button>
         {hasRole('admin') ? (
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => navigate(`/orders/${orderId}/edit`)} // Переход к странице редактирования заказа
-        >
-          Редактировать
-        </Button>
+          <Box sx={{display: 'flex', gap: 2, flexGrow: 1}}>
+            <Button
+              fullWidth
+              variant="contained"
+              color="primary"
+              onClick={() => navigate(`/orders/${orderId}/edit`)} // Переход к странице редактирования заказа
+            >
+              Редактировать
+            </Button>
+          </Box>
         ) : null}
       </Box>
     </Box>

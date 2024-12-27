@@ -3,7 +3,7 @@ import {
   Typography,
   Box,
   Button,
-TextField
+  TextField
 } from '@mui/material';
 import {useSelector} from "react-redux";
 import {useApi} from "../contexts/apiContext";
@@ -147,7 +147,7 @@ function ContractorCreate() {
       )}
 
       {/* Кнопка отправки */}
-      <Box sx={{ display: 'flex', gap: 2, justifyContent: 'space-between', width: '100%' }}>
+      <Box sx={{display: 'flex', gap: 2, justifyContent: 'space-between', width: '100%'}}>
         <Button
           type="button"
           variant="outlined"
@@ -156,14 +156,17 @@ function ContractorCreate() {
         >
           Отмена
         </Button>
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          disabled={isLoading}
-        >
-          {isLoading ? 'Создание...' : 'Создать'}
-        </Button>
+        <Box sx={{flexGrow: 1}}>
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            disabled={isLoading}
+            fullWidth
+          >
+            {isLoading ? 'Создание...' : 'Создать'}
+          </Button>
+        </Box>
       </Box>
     </Box>
   );

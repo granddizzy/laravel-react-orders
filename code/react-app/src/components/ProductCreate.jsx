@@ -159,7 +159,7 @@ function ProductCreate() {
       )}
 
       {/* Кнопки отправки и отмены */}
-      <Box sx={{ display: 'flex', gap: 2, justifyContent: 'space-between', width: '100%' }}>
+      <Box sx={{display: 'flex', gap: 2, justifyContent: 'space-between', width: '100%'}}>
         <Button
           type="button"
           variant="outlined"
@@ -168,14 +168,17 @@ function ProductCreate() {
         >
           Отмена
         </Button>
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          disabled={isLoading}
-        >
-          {isLoading ? 'Создание...' : 'Создать'}
-        </Button>
+        <Box sx={{flexGrow: 1}}>
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            disabled={isLoading}
+            fullWidth
+          >
+            {isLoading ? 'Создание...' : 'Создать'}
+          </Button>
+        </Box>
       </Box>
     </Box>
   );

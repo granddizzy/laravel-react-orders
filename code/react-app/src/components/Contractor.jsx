@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Typography,
   Box,
@@ -7,13 +7,13 @@ import {
   CardContent,
   CardMedia, CircularProgress,
 } from '@mui/material';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useApi } from '../contexts/apiContext';
-import { useSelector } from "react-redux";
+import {useNavigate, useParams} from 'react-router-dom';
+import {useApi} from '../contexts/apiContext';
+import {useSelector} from "react-redux";
 import defaultImage from '../img/default-contractor-image.png'; // Импорт заглушки
 
 function ContractorView() {
-  const { contractorId } = useParams(); // Получаем id продукта из URL
+  const {contractorId} = useParams(); // Получаем id продукта из URL
   const navigate = useNavigate();
   const apiUrl = useApi();
   const [isLoading, setIsLoading] = useState(false);
@@ -29,7 +29,7 @@ function ContractorView() {
     const fetchContractor = async () => {
       setIsLoading(true);
       try {
-        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const headers = token ? {Authorization: `Bearer ${token}`} : {};
         const response = await fetch(`${apiUrl}/contractors/${contractorId}`, {
           method: 'GET', // Указываем метод запроса, по умолчанию 'GET'
           headers, // Заголовки, включая токен, если он есть
@@ -55,7 +55,7 @@ function ContractorView() {
   };
 
   if (isLoading) {
-    return <CircularProgress />;
+    return <CircularProgress/>;
   }
 
   if (error) {
@@ -114,7 +114,7 @@ function ContractorView() {
       )}
 
       {/* Кнопки "Назад" и "Редактировать" */}
-      <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
+      <Box sx={{mt: 2, display: 'flex', gap: 2}}>
         <Button
           variant="outlined"
           color="secondary"
@@ -123,15 +123,18 @@ function ContractorView() {
           Назад
         </Button>
 
-        {(hasRole('admin')) && (
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleEdit}
-          >
-            Редактировать
-          </Button>
-        )}
+        <Box sx={{display: 'flex', gap: 2, flexGrow: 1}}>
+          {(hasRole('admin')) && (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleEdit}
+              fullWidth
+            >
+              Редактировать
+            </Button>
+          )}
+        </Box>
       </Box>
     </Box>
   );

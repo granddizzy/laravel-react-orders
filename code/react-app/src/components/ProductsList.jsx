@@ -160,17 +160,27 @@ function ProductsList() {
             }}
           >
             {isSmallScreen ? (
-              <Box sx={{display: 'flex', flexDirection: 'column'}}>
-                <Typography fontWeight="bold">Артикул:</Typography>
-                <Typography>{product.sku}</Typography>
-                <Typography fontWeight="bold">Наименование:</Typography>
-                <Typography>{product.name}</Typography>
-                <Typography fontWeight="bold">Цена:</Typography>
-                <Typography>{product.price}₽</Typography>
-                <Typography fontWeight="bold">Количество:</Typography>
-                <Typography>{product.stock_quantity}</Typography>
-                <Typography fontWeight="bold">Ед. изм.:</Typography>
-                <Typography>{product.unit}</Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column'}}>
+                <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                  <Typography fontWeight="bold">Артикул:</Typography>
+                  <Typography>{product.sku}</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                  <Typography fontWeight="bold">Наименование:</Typography>
+                  <Typography>{product.name}</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                  <Typography fontWeight="bold">Цена:</Typography>
+                  <Typography>{product.price}₽</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                  <Typography fontWeight="bold">Количество:</Typography>
+                  <Typography>{product.stock_quantity}</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                  <Typography fontWeight="bold">Ед. изм.:</Typography>
+                  <Typography>{product.unit}</Typography>
+                </Box>
               </Box>
             ) : (
               <>

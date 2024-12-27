@@ -387,7 +387,7 @@ function OrderEdit() {
 
       {/* Кнопка для добавления новой строки */}
       <Button variant="outlined" onClick={handleAddItem}>
-        Добавить позицию
+        Добавить строку
       </Button>
 
       {/* Поле ввода заметок (notes) */}
@@ -419,7 +419,7 @@ function OrderEdit() {
           disabled={isSubmit || !formData.contractor_id || formData.products.length === 0}
           sx={{flexGrow: 1}} // кнопка "Сохранить изменения" растягивается
         >
-          {isLoading ? 'Сохранение...' : 'Сохранить изменения'}
+          {isLoading ? 'Сохранение...' : 'Сохранить'}
         </Button>
       </Box>
 

@@ -124,9 +124,9 @@ function ProductView() {
       )}
 
       {/* Кнопки управления */}
-      <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <Box sx={{mt: 2, display: 'flex', flexDirection: 'column', gap: 2}}>
         {/* Верхняя строка с кнопками "Назад" и "В корзину" */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Box sx={{display: 'flex', gap: 2, justifyContent: 'space-between'}}>
           <Button
             variant="outlined"
             color="secondary"
@@ -135,23 +135,27 @@ function ProductView() {
             Назад
           </Button>
 
-          {isInCart ? (
-            <Button
-              variant="contained"
-              color="error"
-              onClick={handleRemoveFromCart}
-            >
-              Из корзины
-            </Button>
-          ) : (
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleAddInCart}
-            >
-              В корзину
-            </Button>
-          )}
+          <Box sx={{ display: 'flex', gap: 2, flexGrow: 1, justifyContent: 'flex-end' }}>
+            {isInCart ? (
+              <Button
+                variant="contained"
+                color="error"
+                onClick={handleRemoveFromCart}
+                fullWidth
+              >
+                Из корзины
+              </Button>
+            ) : (
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleAddInCart}
+                fullWidth
+              >
+                В корзину
+              </Button>
+            )}
+          </Box>
         </Box>
 
         {/* Кнопка "Редактировать" на всю ширину */}

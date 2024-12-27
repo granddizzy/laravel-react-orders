@@ -192,7 +192,7 @@ function ProductEdit() {
           color="primary"
           disabled={isLoading}
         >
-          {isLoading ? 'Обновление...' : 'Обновить продукт'}
+          {isLoading ? 'Обновление...' : 'Сохранить'}
         </Button>
         <Button
           variant="outlined"
