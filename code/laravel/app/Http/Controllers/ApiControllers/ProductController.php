@@ -61,14 +61,6 @@ class ProductController extends Controller {
      * Store a newly created resource in storage.
      */
     public function store(Request $request) {
-        // Получаем текущего аутентифицированного пользователя
-        $user = auth()->user();
-
-        // Проверяем, имеет ли пользователь роль 'admin'
-        if (!$user || !$user->hasRole('admin')) {
-            return response()->json(['error' => 'У вас нет прав для создания продукта'], 403); // Возвращаем ошибку, если пользователь не администратор
-        }
-
         // Валидируем входящие данные
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -117,14 +109,6 @@ class ProductController extends Controller {
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id) {
-        // Получаем текущего аутентифицированного пользователя
-        $user = auth()->user();
-
-        // Проверяем, имеет ли пользователь роль 'admin'
-        if (!$user || !$user->hasRole('admin')) {
-            return response()->json(['error' => 'У вас нет прав для обновления продукта'], 403); // Возвращаем ошибку, если пользователь не администратор
-        }
-
         // Получаем продукт по ID
         $product = Product::find($id);
 
@@ -155,14 +139,6 @@ class ProductController extends Controller {
      * Remove the specified resource from storage.
      */
     public function destroy(string $id) {
-        // Получаем текущего аутентифицированного пользователя
-        $user = auth()->user();
-
-        // Проверяем, имеет ли пользователь роль 'admin'
-        if (!$user || !$user->hasRole('admin')) {
-            return response()->json(['error' => 'У вас нет прав для удаления продукта'], 403); // Возвращаем ошибку, если пользователь не администратор
-        }
-
         // Получаем продукт по ID
         $product = Product::find($id);
 

@@ -26,13 +26,35 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
 //Route::middleware([])->group(function () {
-    // Ресурсные маршруты для сущностей
-    Route::apiResource('contractors', ContractorController::class); // контрагенты
-    Route::apiResource('products', ProductController::class);          // Продукты (номенклатура)
+    // Доступ для всех (чтение данных)
+    Route::get('/contractors', [ContractorController::class, 'index']);
+    Route::get('/contractors/{id}', [ContractorController::class, 'show']);
+
+    // Доступ для администраторов и менеджеров (создание и обновление)
+    Route::middleware(['role:admin|manager'])->group(function () {
+        Route::post('/contractors', [ContractorController::class, 'store']);
+        Route::put('/contractors/{id}', [ContractorController::class, 'update']);
+    });
+
+//     Доступ только для администраторов (удаление)
+    Route::middleware(['role:admin'])->group(function () {
+        Route::delete('/contractors/{id}', [ContractorController::class, 'destroy']);
+    });
+
+    Route::get('/products', [ProductController::class, 'index']);
+    Route::get('/products/{id}', [ProductController::class, 'show']);
+
+    Route::middleware(['role:admin|manager'])->group(function () {
+        Route::post('/products', [ProductController::class, 'store']);
+        Route::put('/products/{id}', [ProductController::class, 'update']);
+    });
+
+    Route::middleware(['role:admin'])->group(function () {
+        Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+    });
 
     // Дополнительные маршруты
     Route::get('orders/{order}/products', [OrderController::class, 'getProducts']); // Продукты в заказе
-    Route::post('orders/{order}/add-product', [OrderController::class, 'addProduct']); // Добавление товара в заказ
     Route::get('contractors/{contractor}/orders', [ContractorController::class, 'getOrders']); // Заказы контрагента
 
     Route::get('/orders', [OrderController::class, 'index']);

@@ -58,4 +58,9 @@ class User extends \TCG\Voyager\Models\User {
     {
         return $this->belongsToMany(Contractor::class, 'user_contractor', 'user_id', 'contractor_id');
     }
+
+    public function hasAnyRole(array $roles): bool
+    {
+        return $this->roles()->whereIn('name', $roles)->exists();
+    }
 }
