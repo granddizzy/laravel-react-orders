@@ -2,7 +2,8 @@ import React, {useEffect, useState} from 'react';
 import {Typography, Box, Button, Card, CardContent, CircularProgress} from '@mui/material';
 import {useNavigate, useParams} from 'react-router-dom';
 import {useApi} from '../contexts/apiContext';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
+import {deleteOrder} from "../redux/ordersSlice";
 
 // Маппинг статусов на русский
 const statusMap = {
@@ -14,6 +15,7 @@ const statusMap = {
 };
 
 function OrderView() {
+  const dispatch = useDispatch();
   const {orderId} = useParams(); // Получаем id заказа из URL
   const navigate = useNavigate();
   const apiUrl = useApi();
@@ -56,6 +58,21 @@ function OrderView() {
   }, [apiUrl, orderId, token]);
 
   const hasRole = (role) => user?.roles?.some(r => r.name === role);
+
+  const handleDelete = () => {
+    dispatch(deleteOrder({
+      apiUrl,
+      token,
+      orderId
+    }))
+      .unwrap() // Разворачиваем результат для обработки успеха или ошибки
+      .then(() => {
+        navigate(-1); // Возвращаемся на предыдущую страницу при успешном удалении
+      })
+      .catch((error) => {
+        console.error('Ошибка при удалении заказа:', error);
+      });
+  }
 
   if (isLoading) {
     return <CircularProgress/>;
@@ -142,6 +159,15 @@ function OrderView() {
               onClick={() => navigate(`/orders/${orderId}/edit`)} // Переход к странице редактирования заказа
             >
               Редактировать
+            </Button>
+            {/* Кнопка удаления */}
+            <Button
+              variant="contained"
+              color="error"
+              sx={{width: 40, height: 40, minWidth: 40, padding: 0}}
+              onClick={handleDelete}
+            >
+              X
             </Button>
           </Box>
         ) : null}

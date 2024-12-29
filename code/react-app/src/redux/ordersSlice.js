@@ -18,6 +18,25 @@ export const fetchOrders = createAsyncThunk(
   }
 );
 
+export const deleteOrder = createAsyncThunk(
+  'orders/deleteOrder',
+  async ({apiUrl, token, orderId}, {rejectWithValue}) => {
+    try {
+      const url = `${apiUrl}/orders/${orderId}`;
+      const headers = token ? {Authorization: `Bearer ${token}`} : {};
+      const response = await apiClient.delete(url, {headers});
+
+      if (response.status !== 200) {
+        throw new Error(`Error: ${response.statusText}`);
+      }
+
+      return orderId;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const initialState = {
   orders: [],
   loading: false,
