@@ -28,6 +28,8 @@ import Order from "./components/Order";
 import OrderCart from "./components/OrderCart";
 import {useEffect} from "react";
 import {logout} from "./redux/authSlice";
+import Users from "./components/Users";
+import User from "./components/User";
 
 const baseUrl = "";
 // const baseUrl = "/orders-app";
@@ -93,6 +95,9 @@ function App() {
               <Route path="/cart" element={auth.token ? <OrderCart/> : <Navigate to="/login"/>}/>s
 
               <Route path="/profile" element={auth.token ? <Profile/> : <Navigate to="/login"/>}/>
+
+              <Route path="/users" element={auth.token ? <Users/> : <Navigate to="/login"/>}/>
+              <Route path="/users/:userId" element={auth.token ? <User/> : <Navigate to="/login"/>}/>
             </Routes>
           </Box>
         </Box>

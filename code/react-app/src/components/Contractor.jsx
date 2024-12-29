@@ -118,7 +118,7 @@ function ContractorView() {
         <Button
           variant="outlined"
           color="secondary"
-          onClick={() => navigate("/clients")}
+          onClick={() => navigate(-1)}
         >
           Назад
         </Button>

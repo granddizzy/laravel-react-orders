@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { setUser } from '../redux/authSlice';
-import axios from 'axios';
+import React, {useEffect, useState} from 'react';
+import {useSelector, useDispatch} from 'react-redux';
+import apiClient from '../api/axiosInstance'
 import {
   TextField,
   Button,
@@ -11,13 +10,20 @@ import {
   CircularProgress,
   Alert,
 } from '@mui/material';
-import { useApi } from '../contexts/apiContext';
+import {useApi} from '../contexts/apiContext';
+import {useNavigate, useParams} from "react-router-dom";
+import UserContractorManager from "./UserContractorManager";
+import {setUser} from "../redux/authSlice";
+import UserRoleManager from "./UserRoleManager";
 
-const Profile = () => {
+const User = () => {
+  const {userId} = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   // Получаем данные пользователя из Redux
   const user = useSelector((state) => state.auth.user);
+  const [isLoading, setIsLoading] = useState(false);
   const token = useSelector((state) => state.auth.token);
   // Используем контекст для базового URL API
   const baseUrl = useApi();
@@ -25,6 +31,7 @@ const Profile = () => {
   // Начальные значения формы - из данных Redux
   const [formData, setFormData] = useState({
     name: user?.name || '',
+    email: user?.email || '',
     password: '', // Новое поле для пароля
     password_confirmation: '', // Новое поле для подтверждения пароля
   });
@@ -33,9 +40,34 @@ const Profile = () => {
   const [successMessage, setSuccessMessage] = useState(null); // Сообщение об успешном обновлении
   const [isUpdating, setIsUpdating] = useState(false);
 
+  useEffect(() => {
+    const fetchUser = async () => {
+      setIsLoading(true);
+      try {
+        const response = await apiClient.get(`${baseUrl}/users/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        dispatch(setUser(response.data));
+        setFormData({
+          name: response.data.name || '',
+          password: '',
+          password_confirmation: '',
+        });
+      } catch (err) {
+        setError('Ошибка при получении данных пользователя');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, [baseUrl, userId, token]);
+
   // Обработчик изменения полей формы
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({...formData, [e.target.name]: e.target.value});
   };
 
   // Обработчик отправки формы для обновления профиля
@@ -56,7 +88,7 @@ const Profile = () => {
     };
 
     try {
-      const response = await axios.put(
+      const response = await apiClient.put(
         `${baseUrl}/profile`, // Ваш API-URL
         dataToSubmit,
         {
@@ -76,10 +108,18 @@ const Profile = () => {
     }
   };
 
+  if (isLoading) {
+    return <CircularProgress/>;
+  }
+
+  if (error) {
+    return <Typography color="error">{`${error}`}</Typography>;
+  }
+
   return (
-    <Container maxWidth="sm" sx={{ mt: 5 }}>
+    <Container maxWidth="sm" sx={{mt: 5}}>
       <Typography variant="h4" component="h1" align="center" gutterBottom>
-        Профиль
+        Пользователь
       </Typography>
       {error && <Alert severity="error">{error}</Alert>}
       {successMessage && <Alert severity="success">{successMessage}</Alert>}
@@ -91,6 +131,7 @@ const Profile = () => {
           display: 'flex',
           flexDirection: 'column',
           gap: 2,
+          mb: 10,
         }}
       >
         <TextField
@@ -124,26 +165,33 @@ const Profile = () => {
           disabled={isUpdating}
         />
 
-        {/* Выводим роль пользователя */}
-        {user?.roles && user.roles.length > 0 && (
-          <Typography variant="body1" sx={{ marginTop: 2 }}>
-            Роли: {user.roles?.map(role => role.displayName).join(', ') || 'Не назначены'}
-          </Typography>
-        )}
-
-        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'space-between' }}>
+        <Box sx={{display: 'flex', gap: 2, justifyContent: 'space-between'}}>
           <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            disabled={isUpdating} // Отключаем кнопку при загрузке
+            type="button"
+            variant="outlined"
+            color="secondary"
+            onClick={() => navigate(-1)}
           >
-            {isUpdating ? <CircularProgress size={24} color="inherit" /> : 'Изменить'}
+            Назад
           </Button>
+          <Box sx={{flexGrow: 1}}>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              disabled={isUpdating} // Отключаем кнопку при загрузке
+              fullWidth
+            >
+              {isUpdating ? <CircularProgress size={24} color="inherit"/> : 'Изменить'}
+            </Button>
+          </Box>
         </Box>
       </Box>
+
+      <UserRoleManager/>
+      <UserContractorManager/>
     </Container>
   );
 };
 
-export default Profile;
+export default User;

@@ -6,6 +6,7 @@ use app\Http\Controllers\ApiControllers\OrderController;
 use app\Http\Controllers\ApiControllers\OrganizationController;
 use app\Http\Controllers\ApiControllers\ProductController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -68,6 +69,17 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/orders/{id}', [OrderController::class, 'destroy']);
     });
 
+    Route::middleware(['role:admin'])->group(function () {
+        Route::get('/users/', [UserController::class, 'index']);
+        Route::get('/users/{id}', [UserController::class, 'show']);
+        Route::delete('/users/{id}', [UserController::class, 'destroy']);
+        Route::post('/users/{id}/contractors', [UserController::class, 'addContractor']);
+        Route::delete('/users/{id}/contractors/{contractorId}', [UserController::class, 'removeContractor']);
+
+        Route::get('/roles', [UserController::class, 'getRoles']);
+        Route::post('/users/{id}/roles', [UserController::class, 'addRole']);
+        Route::delete('/users/{id}/roles/{roleId}', [UserController::class, 'removeRole']);
+    });
 });
 
 // Маршруты для аутентификации

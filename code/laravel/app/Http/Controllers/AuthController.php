@@ -169,27 +169,4 @@ class AuthController extends Controller {
         // Возвращаем данные пользователя
         return response()->json($userData);
     }
-
-    public function deleteUser(Request $request, $id) {
-        // Получаем текущего аутентифицированного пользователя
-        $currentUser = $request->user();
-
-        // Проверка, имеет ли текущий пользователь роль 'admin'
-        if (!$currentUser->hasRole('admin')) {
-            return response()->json(['error' => 'У вас нет прав для удаления пользователя'], 403);
-        }
-
-        // Проверка, существует ли пользователь с данным id
-        $user = User::find($id);
-
-        if (!$user) {
-            return response()->json(['error' => 'Пользователь не найден'], 404);
-        }
-
-        // Удаление пользователя
-        $user->delete();
-
-        // Возвращаем сообщение об успешном удалении
-        return response()->json(['message' => 'Пользователь успешно удален']);
-    }
 }

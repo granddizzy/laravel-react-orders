@@ -4,6 +4,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import CategoryIcon from '@mui/icons-material/Category';
 import PersonIcon from '@mui/icons-material/Person';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import { Link, useLocation } from 'react-router-dom';
 
 function Sidebar({ closeDrawer }) {
@@ -81,6 +82,23 @@ function Sidebar({ closeDrawer }) {
             <CategoryIcon />
           </ListItemIcon>
           <ListItemText primary="Номенклатура" />
+        </ListItem>
+
+        {/* Номенклатура */}
+        <ListItem
+          button
+          component={Link}
+          to="/users"
+          sx={{
+            backgroundColor: isActive('/users') ? 'lightgray' : 'transparent',
+            color: '#1976d2', // всегда голубой цвет
+          }}
+          onClick={closeDrawer} // Закрытие бокового меню при клике
+        >
+          <ListItemIcon>
+            <PersonOutlineIcon  />
+          </ListItemIcon>
+          <ListItemText primary="Пользователи" />
         </ListItem>
       </List>
     </Box>
