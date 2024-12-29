@@ -49,7 +49,6 @@ const usersSlice = createSlice({
         state.loading = true;
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
-        console.log(action.payload)
         state.users = action.payload.data; // Обновляем список
         state.totalPages = action.payload.last_page; // Обновляем количество страниц
         state.currentPage = action.payload.current_page;

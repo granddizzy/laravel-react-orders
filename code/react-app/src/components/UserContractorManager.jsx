@@ -11,9 +11,8 @@ import {useApi} from '../contexts/apiContext';
 import UserContractorsList from "./UserContractorsList";
 import Autocomplete from "@mui/material/Autocomplete";
 import debounce from "lodash.debounce";
-import {setUser} from "../redux/authSlice";
 
-const UserContractorManager = () => {
+const UserContractorManager = ({user, setUser}) => {
   // Получаем данные пользователя из Redux
   const [isLoading, setIsLoading] = useState(false);
   const token = useSelector((state) => state.auth.token);
@@ -22,8 +21,6 @@ const UserContractorManager = () => {
   const [contractorOptions, setContractorOptions] = useState([]);
   const [loadingContractors, setLoadingContractors] = useState(false);
   const [selectedContractor, setSelectedContractor] = useState(null);
-  const user =  useSelector((state) => state.auth.user);
-  const dispatch = useDispatch();
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null); // Сообщение об успешном обновлении
   const [isUpdating, setIsUpdating] = useState(false);
@@ -70,7 +67,7 @@ const UserContractorManager = () => {
       );
 
       if (response.status === 200) {
-        dispatch(setUser(response.data))
+        setUser(response.data);
       }
     } catch (error) {
       setError('Не удалось добавить контрагента. Попробуйте снова.');
@@ -90,7 +87,7 @@ const UserContractorManager = () => {
         mt: 1,
       }}
     >
-      <UserContractorsList />
+      <UserContractorsList user={user} setUser={setUser}/>
       <Box sx={{display: 'flex', gap: 2, mb: 2, width: '100%'}}>
         <Autocomplete
           data-testid="contractor-box"

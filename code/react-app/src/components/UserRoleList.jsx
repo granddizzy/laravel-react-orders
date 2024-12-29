@@ -9,13 +9,10 @@ import {Link} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {useApi} from "../contexts/apiContext";
 import apiClient from '../api/axiosInstance'
-import {setUser} from "../redux/authSlice";
 
-function UserRoleList() {
-  const dispatch = useDispatch();
+function UserRoleList({user, setUser}) {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
-  const user = useSelector((state) => state.auth.user);
   const token = useSelector((state) => state.auth.token);
   const baseUrl = useApi();
 
@@ -32,7 +29,7 @@ function UserRoleList() {
       const response = await apiClient.delete(`${baseUrl}/users/${user.id}/roles/${id}`, {headers});
 
       if (response.status === 200) {
-        dispatch(setUser(response.data));
+        setUser(response.data);
       }
     } catch (error) {
       // Если произошла ошибка, выводим сообщение
@@ -90,7 +87,7 @@ function UserRoleList() {
                 <Box sx={{display: 'flex', flexDirection: 'column'}}>
                   <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
                     <Typography fontWeight="bold">Наименование:</Typography>
-                    <Typography>{role.name}</Typography>
+                    <Typography>{role.displayName}</Typography>
                   </Box>
 
                   {/* Кнопка УДАЛИТЬ */}
@@ -108,7 +105,7 @@ function UserRoleList() {
             ) : (
               // Для больших экранов показываем стандартную таблицу
               <>
-                <Typography>{role.name}</Typography>
+                <Typography>{role.displayName}</Typography>
                 {/* Кнопка "Удалить" */}
                 {user.roles.length > 1 && (
                   <Button

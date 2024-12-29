@@ -8,18 +8,14 @@ import {
 } from '@mui/material';
 import {useApi} from '../contexts/apiContext';
 import UserRoleList from "./UserRoleList";
-import {setUser} from "../redux/authSlice";
-import axios from "axios";
 
-const UserRoleManager = () => {
+const UserRoleManager = ({user, setUser}) => {
   const [isLoading, setIsLoading] = useState(false);
   const token = useSelector((state) => state.auth.token);
   const baseUrl = useApi();
   const [contractorOptions, setContractorOptions] = useState([]);
   const [loadingContractors, setLoadingContractors] = useState(false);
   const [selectedRole, setSelectedRole] = useState(null);
-  const user = useSelector((state) => state.auth.user);
-  const dispatch = useDispatch();
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -71,7 +67,7 @@ const UserRoleManager = () => {
       );
 
       if (response.status === 200) {
-        dispatch(setUser(response.data))
+        setUser(response.data)
       }
     } catch (error) {
       setError('Не удалось добавить роль. Попробуйте снова.');
@@ -105,7 +101,7 @@ const UserRoleManager = () => {
         mt: 1,
       }}
     >
-      <UserRoleList/>
+      <UserRoleList user={user} setUser={setUser}/>
       <Box sx={{display: 'flex', gap: 2, mb: 2, width: '100%'}}>
         <FormControl fullWidth error={!selectedRole && error}>
           <InputLabel id="role-label">Роль *</InputLabel>

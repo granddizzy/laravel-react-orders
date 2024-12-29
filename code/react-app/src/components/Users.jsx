@@ -62,17 +62,6 @@ function Users() {
 
       {/* Кнопка и выпадающий список */}
       <Box sx={{display: 'flex', justifyContent: 'space-between', mb: 2}}>
-        { (hasRole('admin')) && (
-          <Button
-            variant="contained"
-            color="primary"
-            component={Link}
-            to="/users/create"
-          >
-            Добавить
-          </Button>
-        )}
-
         <FormControl sx={{minWidth: 120}}>
           <InputLabel id="page-size-label">На странице</InputLabel>
           <Select

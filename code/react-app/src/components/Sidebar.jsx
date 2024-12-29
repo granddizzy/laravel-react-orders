@@ -1,20 +1,23 @@
 import React from 'react';
-import { Box, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import {Box, List, ListItem, ListItemIcon, ListItemText} from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import CategoryIcon from '@mui/icons-material/Category';
 import PersonIcon from '@mui/icons-material/Person';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
-import { Link, useLocation } from 'react-router-dom';
+import {Link, useLocation} from 'react-router-dom';
+import {useSelector} from "react-redux";
 
-function Sidebar({ closeDrawer }) {
+function Sidebar({closeDrawer}) {
   const location = useLocation(); // Получаем текущий путь для активного элемента
-
+  const user = useSelector((state) => state.auth.user);
   // Функция для проверки активного пути
   const isActive = (path) => location.pathname === path;
 
+  const hasRole = (role) => user?.roles?.some(r => r.name === role);
+
   return (
-    <Box sx={{ width: 240 }}>
+    <Box sx={{width: 240}}>
       <List>
         {/* Главная */}
         <ListItem
@@ -28,9 +31,9 @@ function Sidebar({ closeDrawer }) {
           onClick={closeDrawer} // Закрытие бокового меню при клике
         >
           <ListItemIcon>
-            <HomeIcon />
+            <HomeIcon/>
           </ListItemIcon>
-          <ListItemText primary="Главная" />
+          <ListItemText primary="Главная"/>
         </ListItem>
 
         {/* Заказы */}
@@ -45,9 +48,9 @@ function Sidebar({ closeDrawer }) {
           onClick={closeDrawer} // Закрытие бокового меню при клике
         >
           <ListItemIcon>
-            <ListAltIcon />
+            <ListAltIcon/>
           </ListItemIcon>
-          <ListItemText primary="Заказы" />
+          <ListItemText primary="Заказы"/>
         </ListItem>
 
         {/* Контрагенты */}
@@ -62,9 +65,9 @@ function Sidebar({ closeDrawer }) {
           onClick={closeDrawer} // Закрытие бокового меню при клике
         >
           <ListItemIcon>
-            <PersonIcon />
+            <PersonIcon/>
           </ListItemIcon>
-          <ListItemText primary="Контрагенты" />
+          <ListItemText primary="Контрагенты"/>
         </ListItem>
 
         {/* Номенклатура */}
@@ -79,27 +82,29 @@ function Sidebar({ closeDrawer }) {
           onClick={closeDrawer} // Закрытие бокового меню при клике
         >
           <ListItemIcon>
-            <CategoryIcon />
+            <CategoryIcon/>
           </ListItemIcon>
-          <ListItemText primary="Номенклатура" />
+          <ListItemText primary="Номенклатура"/>
         </ListItem>
 
-        {/* Номенклатура */}
-        <ListItem
-          button
-          component={Link}
-          to="/users"
-          sx={{
-            backgroundColor: isActive('/users') ? 'lightgray' : 'transparent',
-            color: '#1976d2', // всегда голубой цвет
-          }}
-          onClick={closeDrawer} // Закрытие бокового меню при клике
-        >
-          <ListItemIcon>
-            <PersonOutlineIcon  />
-          </ListItemIcon>
-          <ListItemText primary="Пользователи" />
-        </ListItem>
+        {/* Пользователи */}
+        {hasRole('admin') ? (
+          <ListItem
+            button
+            component={Link}
+            to="/users"
+            sx={{
+              backgroundColor: isActive('/users') ? 'lightgray' : 'transparent',
+              color: '#1976d2', // всегда голубой цвет
+            }}
+            onClick={closeDrawer} // Закрытие бокового меню при клике
+          >
+            <ListItemIcon>
+              <PersonOutlineIcon/>
+            </ListItemIcon>
+            <ListItemText primary="Пользователи"/>
+          </ListItem>
+        ) : null}
       </List>
     </Box>
   );

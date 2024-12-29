@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {useSelector, useDispatch} from 'react-redux';
+import {useSelector} from 'react-redux';
 import apiClient from '../api/axiosInstance'
 import {
   TextField,
@@ -13,16 +13,13 @@ import {
 import {useApi} from '../contexts/apiContext';
 import {useNavigate, useParams} from "react-router-dom";
 import UserContractorManager from "./UserContractorManager";
-import {setUser} from "../redux/authSlice";
 import UserRoleManager from "./UserRoleManager";
 
 const User = () => {
   const {userId} = useParams();
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Получаем данные пользователя из Redux
-  const user = useSelector((state) => state.auth.user);
+  const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const token = useSelector((state) => state.auth.token);
   // Используем контекст для базового URL API
@@ -49,7 +46,7 @@ const User = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        dispatch(setUser(response.data));
+        setUser(response.data);
         setFormData({
           name: response.data.name || '',
           password: '',
@@ -98,7 +95,7 @@ const User = () => {
         }
       );
       // После успешного обновления профиля
-      dispatch(setUser(response.data)); // Обновляем данные пользователя в Redux
+      setUser(response.data); // Обновляем данные пользователя в Redux
       setSuccessMessage('Профиль успешно обновлен'); // Устанавливаем сообщение об успехе
       setError(null); // Очищаем ошибку
     } catch (err) {
@@ -188,8 +185,8 @@ const User = () => {
         </Box>
       </Box>
 
-      <UserRoleManager/>
-      <UserContractorManager/>
+      <UserRoleManager user={user} setUser={setUser}/>
+      <UserContractorManager user={user} setUser={setUser}/>
     </Container>
   );
 };

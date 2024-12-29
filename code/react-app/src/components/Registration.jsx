@@ -13,7 +13,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import {useApi} from "../contexts/apiContext";
-import {useNavigate} from "react-router-dom";
+import {Navigate, useNavigate} from "react-router-dom";
 
 const Register = () => {
   const dispatch = useDispatch();
@@ -51,13 +51,13 @@ const Register = () => {
         password: formData.password,
       });
 
-      const { token, user } = loginResponse.data;
+      const {token, user} = loginResponse.data;
 
       if (!token || !user) {
         throw new Error('Некорректный ответ от сервера при авторизации');
       }
 
-      dispatch(login({ token, user }));
+      dispatch(login({token, user}));
       setError(null);
       navigate('/');
     } catch (err) {
@@ -84,7 +84,6 @@ const Register = () => {
       setIsLoading(false); // Завершаем состояние загрузки
     }
   };
-
 
 
   return (
@@ -145,15 +144,28 @@ const Register = () => {
           disabled={isLoading} // Отключаем поле при загрузке
         />
         {error && <Alert severity="error">{error}</Alert>}
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          fullWidth
-          disabled={isLoading} // Отключаем кнопку при загрузке
-        >
-          {isLoading ? <CircularProgress size={24} color="inherit"/> : 'Зарегистрироваться'}
-        </Button>
+        <Box display="flex" gap={2} alignItems="center">
+          {/* Кнопка "Назад" */}
+          <Button
+            type="button"
+            variant="outlined"
+            color="secondary"
+            onClick={() => navigate(-1)}
+          >
+            Назад
+          </Button>
+
+          {/* Кнопка "Зарегистрироваться" */}
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            fullWidth // Делаем кнопку на всю ширину оставшегося пространства
+            disabled={isLoading} // Отключаем кнопку при загрузке
+          >
+            {isLoading ? <CircularProgress size={24} color="inherit"/> : 'Зарегистрироваться'}
+          </Button>
+        </Box>
       </Box>
     </Container>
   );
