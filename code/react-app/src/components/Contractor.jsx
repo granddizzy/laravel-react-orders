@@ -9,8 +9,9 @@ import {
 } from '@mui/material';
 import {useNavigate, useParams} from 'react-router-dom';
 import {useApi} from '../contexts/apiContext';
-import {useSelector} from "react-redux";
-import defaultImage from '../img/default-contractor-image.png'; // Импорт заглушки
+import {useDispatch, useSelector} from "react-redux";
+import defaultImage from '../img/default-contractor-image.png';
+import {deleteContractor} from "../redux/contractorsSlice";
 
 function ContractorView() {
   const {contractorId} = useParams(); // Получаем id продукта из URL
@@ -19,6 +20,7 @@ function ContractorView() {
   const [isLoading, setIsLoading] = useState(false);
   const [contractor, setContractor] = useState(null);
   const [error, setError] = useState(null);
+  const dispatch = useDispatch();
 
   const token = useSelector((state) => state.auth.token);
 
@@ -54,6 +56,23 @@ function ContractorView() {
     navigate(`/contractors/${contractorId}/edit`);
   };
 
+  const handleDelete = () => {
+    dispatch(deleteContractor({
+      apiUrl,
+      token,
+      contractorId
+    }))
+      .unwrap() // Разворачиваем результат для обработки успеха или ошибки
+      .then(() => {
+        navigate(-1); // Возвращаемся на предыдущую страницу при успешном удалении
+      })
+      .catch((error) => {
+        console.error('Ошибка при удалении контрагента:', error);
+      });
+  }
+
+  const hasRole = (role) => user?.roles?.some(r => r.name === role);
+
   if (isLoading) {
     return <CircularProgress/>;
   }
@@ -61,8 +80,6 @@ function ContractorView() {
   if (error) {
     return <Typography color="error">{`${error}`}</Typography>;
   }
-
-  const hasRole = (role) => user?.roles?.some(r => r.name === role);
 
   return (
     <Box
@@ -125,14 +142,25 @@ function ContractorView() {
 
         <Box sx={{display: 'flex', gap: 2, flexGrow: 1}}>
           {(hasRole('admin')) && (
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleEdit}
-              fullWidth
-            >
-              Редактировать
-            </Button>
+            <Box sx={{display: 'flex', gap: 2, alignItems: 'center'}}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleEdit}
+                fullWidth
+              >
+                Редактировать
+              </Button>
+              {/* Кнопка удаления */}
+              <Button
+                variant="contained"
+                color="error"
+                sx={{width: 40, height: 40, minWidth: 40, padding: 0}}
+                onClick={handleDelete}
+              >
+                X
+              </Button>
+            </Box>
           )}
         </Box>
       </Box>

@@ -6,7 +6,7 @@ export const fetchContractors = createAsyncThunk(
   async ({url, token}) => {
     try {
       // Формируем заголовки с токеном
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const headers = token ? {Authorization: `Bearer ${token}`} : {};
 
       const response = await apiClient.get(url, {headers});
       if (response.status !== 200) {
@@ -15,6 +15,25 @@ export const fetchContractors = createAsyncThunk(
       return response.data;
     } catch (error) {
       throw new Error(error.message);
+    }
+  }
+);
+
+export const deleteContractor = createAsyncThunk(
+  'contractors/deleteContractor',
+  async ({apiUrl, token, contractorId}, {rejectWithValue}) => {
+    try {
+      const url = `${apiUrl}/contractors/${contractorId}`;
+      const headers = token ? {Authorization: `Bearer ${token}`} : {};
+      const response = await apiClient.delete(url, {headers});
+
+      if (response.status !== 200) {
+        throw new Error(`Error: ${response.statusText}`);
+      }
+
+      return contractorId; // Возвращаем ID удаленного контрагента
+    } catch (error) {
+      return rejectWithValue(error.message);
     }
   }
 );
@@ -60,6 +79,24 @@ const contractorsSlice = createSlice({
       .addCase(fetchContractors.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
+      })
+      // Удаление контрагента
+      .addCase(deleteContractor.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(deleteContractor.fulfilled, (state, action) => {
+        const deletedId = action.payload;
+
+        // Убираем удаленного контрагента из списка
+        state.contractors = state.contractors.filter(
+          (contractor) => contractor.id !== deletedId
+        );
+
+        state.loading = false;
+      })
+      .addCase(deleteContractor.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
