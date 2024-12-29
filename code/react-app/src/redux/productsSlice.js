@@ -62,6 +62,29 @@ export const fetchPreviousProducts = createAsyncThunk(
   }
 );
 
+export const deleteProduct = createAsyncThunk(
+  'products/deleteProduct',
+  async ({apiUrl, token, productId}, {rejectWithValue}) => {
+    try {
+      const url = `${apiUrl}/products/${productId}`;
+      const headers = token ? {Authorization: `Bearer ${token}`} : {};
+
+      const response = await apiClient.delete(url, {
+        headers,
+      });
+
+      if (response.status !== 200) {
+        throw new Error(`Error: ${response.statusText}`);
+      }
+
+      return productId;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+
 const initialState = {
   products: [],
   loading: false,
@@ -120,6 +143,23 @@ const productsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // удаление товара
+      .addCase(deleteProduct.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(deleteProduct.fulfilled, (state, action) => {
+        const deletedProductId = action.payload;
+
+        state.products = state.products.filter(
+          (product) => product.id !== deletedProductId // Удаляем товар из списка
+        );
+
+        state.loading = false;
+      })
+      .addCase(deleteProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
       // Обработка загрузки следующих данных
       .addCase(fetchMoreProducts.pending, (state) => {
         state.loading = true;
@@ -169,6 +209,6 @@ export const {
   setPageSize,
   setSearch,
   removeOldNextProducts,
-  removeOldPrevProducts
+  removeOldPrevProducts,
 } = productsSlice.actions;
 export default productsSlice.reducer;

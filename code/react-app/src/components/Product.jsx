@@ -11,7 +11,8 @@ import {useNavigate, useParams} from 'react-router-dom';
 import {useApi} from '../contexts/apiContext';
 import {useDispatch, useSelector} from "react-redux";
 import defaultImage from '../img/default-product-image.png';
-import {addProduct, removeProduct} from "../redux/cartSlice"; // Импорты экшенов
+import {addProduct, removeProduct} from "../redux/cartSlice";
+import {deleteProduct, fetchPreviousProducts, removeOldNextProducts} from "../redux/productsSlice";
 
 function ProductView() {
   const {productId} = useParams(); // Получаем id продукта из URL
@@ -70,6 +71,23 @@ function ProductView() {
     }
   };
 
+  const hasRole = (role) => user?.roles?.some(r => r.name === role);
+
+  const handleDelete = () => {
+    dispatch(deleteProduct({
+      apiUrl,
+      token,
+      productId
+    }))
+      .unwrap() // Разворачиваем результат для обработки успеха или ошибки
+      .then(() => {
+        navigate(-1); // Возвращаемся на предыдущую страницу при успешном удалении
+      })
+      .catch((error) => {
+        console.error('Ошибка при удалении товара:', error);
+      });
+  }
+
   if (isLoading) {
     return <CircularProgress/>;
   }
@@ -77,8 +95,6 @@ function ProductView() {
   if (error) {
     return <Typography color="error">{`${error}`}</Typography>;
   }
-
-  const hasRole = (role) => user?.roles?.some(r => r.name === role);
 
   return (
     <Box
@@ -135,7 +151,7 @@ function ProductView() {
             Назад
           </Button>
 
-          <Box sx={{ display: 'flex', gap: 2, flexGrow: 1, justifyContent: 'flex-end' }}>
+          <Box sx={{display: 'flex', gap: 2, flexGrow: 1, justifyContent: 'flex-end'}}>
             {isInCart ? (
               <Button
                 variant="contained"
@@ -160,14 +176,25 @@ function ProductView() {
 
         {/* Кнопка "Редактировать" на всю ширину */}
         {hasRole('admin') ? (
-          <Button
-            variant="contained"
-            color="primary"
-            fullWidth
-            onClick={() => navigate(`/products/${productId}/edit`)}
-          >
-            Редактировать
-          </Button>
+          <Box sx={{display: 'flex', gap: 2, alignItems: 'center'}}>
+            <Button
+              variant="contained"
+              color="primary"
+              fullWidth
+              onClick={() => navigate(`/products/${productId}/edit`)}
+            >
+              Редактировать
+            </Button>
+            {/* Кнопка удаления */}
+            <Button
+              variant="contained"
+              color="error"
+              sx={{width: 40, height: 40, minWidth: 40, padding: 0}}
+              onClick={handleDelete}
+            >
+              X
+            </Button>
+          </Box>
         ) : null}
       </Box>
 
