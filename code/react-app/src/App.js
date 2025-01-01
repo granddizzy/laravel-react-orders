@@ -31,8 +31,7 @@ import {logout} from "./redux/authSlice";
 import Users from "./components/Users";
 import User from "./components/User";
 
-const baseUrl = "";
-// const baseUrl = "/orders-app";
+const baseUrl = process.env.REACT_APP_BASE_URL || "";
 
 function App() {
   const isDesktop = useMediaQuery((theme) => theme.breakpoints.up('sm')); // Определяем десктоп
